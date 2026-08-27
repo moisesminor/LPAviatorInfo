@@ -13,6 +13,9 @@
 			--muted: color-mix(in oklch, var(--text) 75%, var(--secondary) 25%);
 		}
 
+		/* Rolagem suave para âncoras */
+		html{scroll-behavior:smooth}
+
 		/* Classes utilitárias simples para aplicar as cores */
 		.site-bg{background:linear-gradient(180deg,var(--secondary),var(--primary));}
 		.brand-title{color:var(--primary)!important}
@@ -20,6 +23,14 @@
 		.cta-btn{background:var(--primary)!important;color:var(--secondary)!important}
 		.site-footer{color:var(--muted)!important}
 		.img-border{border-color:color-mix(in oklch, var(--secondary) 10%, black 90%) !important}
+		/* Botão: transição suave ao clicar */
+		.cta-btn{transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease}
+		.cta-btn:active{transform:scale(.98);opacity:.95}
+
+		/* Seção de modelos: animação de entrada ao aparecer na área visível */
+		.models{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease}
+		.models.in-view{opacity:1;transform:none}
+
 		.aircraft-card{background:color-mix(in oklch, var(--secondary) 92%, transparent);color:var(--text);transition:transform .2s ease,box-shadow .2s ease}
 		.aircraft-card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(2,6,23,.25)}
 	</style>
@@ -41,7 +52,7 @@
 			</aside>
 		</section>
 
-		<section aria-labelledby="aircraft-title">
+		<section aria-labelledby="aircraft-title" class="models">
 			<div class="mb-6">
 				<p class="mb-1 text-sm font-semibold uppercase tracking-[2px] text-white/70">Explore a frota</p>
 				<h2 id="aircraft-title" class="text-3xl font-bold text-white sm:text-4xl">Modelos em destaque</h2>
@@ -70,6 +81,21 @@
 
 	<script>
 		document.getElementById('year').textContent = new Date().getFullYear();
+
+		// Animação de entrada para a seção de modelos usando IntersectionObserver
+		(function(){
+			const section = document.querySelector('.models');
+			if(!section) return;
+			const obs = new IntersectionObserver((entries)=>{
+				for(const e of entries){
+					if(e.isIntersecting){
+						section.classList.add('in-view');
+						obs.disconnect();
+					}
+				}
+			},{threshold:0.18});
+			obs.observe(section);
+		})();
 	</script>
 </body>
 </html>
