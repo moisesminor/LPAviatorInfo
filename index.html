@@ -5,20 +5,36 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>Aviator Info</title>
 	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		:root{
+			--primary: oklch(62.3% 0.214 259.815); /* cor principal */
+			--secondary: oklch(97.7% 0.013 236.62); /* cor secundária */
+			--text: oklch(12.9% 0.042 264.695); /* cor para textos */
+			--muted: color-mix(in oklch, var(--text) 75%, var(--secondary) 25%);
+		}
+
+		/* Classes utilitárias simples para aplicar as cores */
+		.site-bg{background:linear-gradient(180deg,var(--secondary),var(--primary));}
+		.brand-title{color:var(--primary)!important}
+		.brand-p{color:var(--text)!important}
+		.cta-btn{background:var(--primary)!important;color:var(--secondary)!important}
+		.site-footer{color:var(--muted)!important}
+		.img-border{border-color:color-mix(in oklch, var(--secondary) 10%, black 90%) !important}
+	</style>
 </head>
-	<body class="m-0 min-h-screen bg-gradient-to-b from-[#021025] to-[#071028] font-sans text-white/85">
+	<body class="m-0 min-h-screen font-sans site-bg">
 	<main class="flex min-h-screen items-center justify-center px-5 py-12">
 		<section class="grid w-full max-w-[1100px] items-center gap-7 rounded-[14px] bg-gradient-to-b from-white/[0.02] to-transparent p-7 lg:grid-cols-[1fr_520px]" aria-labelledby="home-title">
 			<div>
-				<h1 id="home-title" class="mb-2 text-[32px] font-bold tracking-[0.4px] text-white sm:text-5xl">Aviator Info</h1>
-				<p class="mb-[18px] text-lg leading-[1.5] text-white/90">Informações sobre modelos de aeronaves: especificações, história e curiosidades para entusiastas e profissionais da aviação.</p>
-				<a class="inline-block rounded-[10px] bg-[#1fb6ff] px-4 py-2.5 font-semibold text-[#042033]" href="#">Explorar modelos</a>
+				<h1 id="home-title" class="mb-2 text-[32px] font-bold tracking-[0.4px] brand-title sm:text-5xl">Aviator Info</h1>
+				<p class="mb-[18px] text-lg leading-[1.5] brand-p">Informações sobre modelos de aeronaves: especificações, história e curiosidades para entusiastas e profissionais da aviação.</p>
+				<a class="inline-block rounded-[10px] cta-btn px-4 py-2.5 font-semibold" href="#">Explorar modelos</a>
 			</div>
 
 			<aside class="grid grid-cols-2 gap-3" aria-hidden="false">
-				<img src="https://source.unsplash.com/1200x800/?airbus%20a320" alt="Airbus A320 em voo" class="col-span-2 h-[140px] w-full rounded-[10px] border border-white/[0.03] object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[300px]">
-				<img src="https://source.unsplash.com/800x600/?boeing%20737%20max" alt="Boeing 737 MAX-8 em voo" class="h-[140px] w-full rounded-[10px] border border-white/[0.03] object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[170px]">
-				<img src="https://source.unsplash.com/800x600/?aircraft%20cockpit" alt="Cockpit de aeronave" class="h-[140px] w-full rounded-[10px] border border-white/[0.03] object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[170px]">
+				<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A320Neo em voo" class="col-span-2 h-[140px] w-full rounded-[10px] border object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] img-border sm:h-[300px]">
+				<img src="https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/boeing-737-max-8.jpeg" alt="Boeing 737 MAX-8 em voo" class="h-[140px] w-full rounded-[10px] border object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] img-border sm:h-[170px]">
+				<img src="https://de2y7ybiap967.cloudfront.net/images/com_hikashop/upload/thumbnails/1000x1000/img_1252.jpg" alt="Cockpit de A320" class="h-[140px] w-full rounded-[10px] border object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] img-border sm:h-[170px]">
 			</aside>
 		</section>
 	</main>
