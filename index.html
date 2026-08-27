@@ -4,41 +4,26 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>Aviator Info</title>
-	<style>
-		:root{--bg:#071028;--card:#0f1724;--accent:#1fb6ff;--muted:rgba(255,255,255,0.85)}
-		*{box-sizing:border-box}
-		html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:var(--muted);background:linear-gradient(180deg,#021025 0%, #071028 60%)}
-		.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 20px}
-		.wrap{width:100%;max-width:1100px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:14px;padding:28px;display:grid;grid-template-columns:1fr 520px;gap:28px;align-items:center}
-		.brand h1{font-size:48px;margin:0 0 8px;color:#fff;letter-spacing:0.4px}
-		.brand p{margin:0 0 18px;font-size:18px;color:rgba(255,255,255,0.9);line-height:1.5}
-		.cta{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--accent);color:#042033;text-decoration:none;font-weight:600}
-		.image-panel{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-		.image-panel img{width:100%;height:170px;object-fit:cover;border-radius:10px;box-shadow:0 8px 20px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-		.large{grid-column:1 / -1;height:300px}
-		@media (max-width:980px){.wrap{grid-template-columns:1fr;}} 
-		@media (max-width:520px){.brand h1{font-size:32px}.image-panel img{height:140px}}
-		footer{padding:18px;text-align:center;color:rgba(255,255,255,0.6);font-size:14px}
-	</style>
+	<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-	<main class="hero">
-		<section class="wrap" aria-labelledby="home-title">
-			<div class="brand">
-				<h1 id="home-title">Aviator Info</h1>
-				<p>Informações sobre modelos de aeronaves: especificações, história e curiosidades para entusiastas e profissionais da aviação.</p>
-				<a class="cta" href="#">Explorar modelos</a>
+	<body class="m-0 min-h-screen bg-gradient-to-b from-[#021025] to-[#071028] font-sans text-white/85">
+	<main class="flex min-h-screen items-center justify-center px-5 py-12">
+		<section class="grid w-full max-w-[1100px] items-center gap-7 rounded-[14px] bg-gradient-to-b from-white/[0.02] to-transparent p-7 lg:grid-cols-[1fr_520px]" aria-labelledby="home-title">
+			<div>
+				<h1 id="home-title" class="mb-2 text-[32px] font-bold tracking-[0.4px] text-white sm:text-5xl">Aviator Info</h1>
+				<p class="mb-[18px] text-lg leading-[1.5] text-white/90">Informações sobre modelos de aeronaves: especificações, história e curiosidades para entusiastas e profissionais da aviação.</p>
+				<a class="inline-block rounded-[10px] bg-[#1fb6ff] px-4 py-2.5 font-semibold text-[#042033]" href="#">Explorar modelos</a>
 			</div>
 
-			<aside class="image-panel" aria-hidden="false">
-				<img src="https://source.unsplash.com/1200x800/?airbus%20a320" alt="Airbus A320 em voo" class="large">
-				<img src="https://source.unsplash.com/800x600/?boeing%20737%20max" alt="Boeing 737 MAX-8 em voo">
-				<img src="https://source.unsplash.com/800x600/?aircraft%20cockpit" alt="Cockpit de aeronave">
+			<aside class="grid grid-cols-2 gap-3" aria-hidden="false">
+				<img src="https://source.unsplash.com/1200x800/?airbus%20a320" alt="Airbus A320 em voo" class="col-span-2 h-[140px] w-full rounded-[10px] border border-white/[0.03] object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[300px]">
+				<img src="https://source.unsplash.com/800x600/?boeing%20737%20max" alt="Boeing 737 MAX-8 em voo" class="h-[140px] w-full rounded-[10px] border border-white/[0.03] object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[170px]">
+				<img src="https://source.unsplash.com/800x600/?aircraft%20cockpit" alt="Cockpit de aeronave" class="h-[140px] w-full rounded-[10px] border border-white/[0.03] object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[170px]">
 			</aside>
 		</section>
 	</main>
 
-	<footer>
+	<footer class="p-[18px] text-center text-sm text-white/60">
 		© <span id="year"></span> Aviator Info — Dados e imagens para fins informativos.
 	</footer>
 
