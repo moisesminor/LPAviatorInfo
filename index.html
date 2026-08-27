@@ -20,15 +20,18 @@
 		.cta-btn{background:var(--primary)!important;color:var(--secondary)!important}
 		.site-footer{color:var(--muted)!important}
 		.img-border{border-color:color-mix(in oklch, var(--secondary) 10%, black 90%) !important}
+		.aircraft-card{background:color-mix(in oklch, var(--secondary) 92%, transparent);color:var(--text);transition:transform .2s ease,box-shadow .2s ease}
+		.aircraft-card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(2,6,23,.25)}
 	</style>
 </head>
 	<body class="m-0 min-h-screen font-sans site-bg">
-	<main class="flex min-h-screen items-center justify-center px-5 py-12">
-		<section class="grid w-full max-w-[1100px] items-center gap-7 rounded-[14px] bg-gradient-to-b from-white/[0.02] to-transparent p-7 lg:grid-cols-[1fr_520px]" aria-labelledby="home-title">
+	<main class="min-h-screen px-5 py-12">
+		<div class="mx-auto flex max-w-[1100px] flex-col gap-14">
+		<section class="grid items-center gap-7 rounded-[14px] bg-gradient-to-b from-white/[0.02] to-transparent p-7 lg:grid-cols-[1fr_520px]" aria-labelledby="home-title">
 			<div>
 				<h1 id="home-title" class="mb-2 text-[32px] font-bold tracking-[0.4px] brand-title sm:text-5xl">Aviator Info</h1>
 				<p class="mb-[18px] text-lg leading-[1.5] brand-p">Informações sobre modelos de aeronaves: especificações, história e curiosidades para entusiastas e profissionais da aviação.</p>
-				<a class="inline-block rounded-[10px] cta-btn px-4 py-2.5 font-semibold" href="#">Explorar modelos</a>
+				<a class="inline-block rounded-[10px] cta-btn px-4 py-2.5 font-semibold" href="#aircraft-title">Explorar modelos</a>
 			</div>
 
 			<aside class="grid grid-cols-2 gap-3" aria-hidden="false">
@@ -37,6 +40,28 @@
 				<img src="https://de2y7ybiap967.cloudfront.net/images/com_hikashop/upload/thumbnails/1000x1000/img_1252.jpg" alt="Cockpit de A320" class="h-[140px] w-full rounded-[10px] border object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] img-border sm:h-[170px]">
 			</aside>
 		</section>
+
+		<section aria-labelledby="aircraft-title">
+			<div class="mb-6">
+				<p class="mb-1 text-sm font-semibold uppercase tracking-[2px] text-white/70">Explore a frota</p>
+				<h2 id="aircraft-title" class="text-3xl font-bold text-white sm:text-4xl">Modelos em destaque</h2>
+			</div>
+			<div class="grid gap-5 md:grid-cols-3">
+				<a href="aircraft/airbus-a320neo.html" class="aircraft-card group overflow-hidden rounded-[10px] shadow-[0_8px_20px_rgba(2,6,23,0.2)]" aria-label="Ver informações do Airbus A320neo">
+					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A320neo em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Airbus A320neo</span>
+				</a>
+				<a href="aircraft/boeing-737-max-8.html" class="aircraft-card group overflow-hidden rounded-[10px] shadow-[0_8px_20px_rgba(2,6,23,0.2)]" aria-label="Ver informações do Boeing 737 MAX 8">
+					<img src="https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/boeing-737-max-8.jpeg" alt="Boeing 737 MAX 8 em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Boeing 737 MAX 8</span>
+				</a>
+				<a href="aircraft/airbus-a350.html" class="aircraft-card group overflow-hidden rounded-[10px] shadow-[0_8px_20px_rgba(2,6,23,0.2)]" aria-label="Ver informações do Airbus A350">
+					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A350 em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Airbus A350</span>
+				</a>
+			</div>
+		</section>
+		</div>
 	</main>
 
 	<footer class="p-[18px] text-center text-sm text-white/60">
