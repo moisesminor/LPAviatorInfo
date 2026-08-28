@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<title>Aeroportos | Aviator Info</title>
+	<link rel="stylesheet" href="./dist/tailwind.css">
+</head>
+	<body class="m-0 min-h-screen bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+	<header class="fixed inset-x-0 top-0 z-50 flex min-h-16 items-center bg-[#438ff0] shadow-[0_1px_0_rgba(0,0,0,0.18)]" aria-label="Navegação principal">
+		<a class="absolute left-[18px] top-1 flex h-14 w-[66px] items-center justify-center max-sm:left-1" href="./index.html" aria-label="Ir para a página principal"><img class="block h-14 w-[62px] object-contain" src="./images/AviatorLogo.png" alt="Aviator Info"></a>
+		<nav class="flex w-full items-center justify-center gap-1 px-1 pl-[78px] sm:gap-[clamp(28px,15vw,220px)] sm:px-[100px] sm:pl-[100px]">
+			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./modelos.html">Modelos</a>
+			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-black no-underline transition sm:px-[18px] sm:py-2.5" href="./aeroportos.html" aria-current="page">Aeroportos</a>
+			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./companhias.html">Companhias</a>
+		</nav>
+	</header>
+	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Aeroportos</h1>
+		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Conheça aeroportos importantes, seus códigos, localização e estrutura para receber passageiros do mundo todo.</p>
+		<section class="mt-[34px] grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]" aria-label="Aeroportos em destaque">
+			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Guarulhos (GRU)</h2><p class="text-lg leading-[1.6] text-[#18283b]">O principal aeroporto internacional de São Paulo.</p></article>
+			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Galeão (GIG)</h2><p class="text-lg leading-[1.6] text-[#18283b]">Uma das principais portas de entrada do Rio de Janeiro.</p></article>
+			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Lisboa (LIS)</h2><p class="text-lg leading-[1.6] text-[#18283b]">Um importante ponto de conexão entre Europa e América.</p></article>
+		</section>
+	</main>
+</body>
+</html>
