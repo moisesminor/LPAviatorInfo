@@ -19,10 +19,25 @@
 	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
 		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Modelos</h1>
 		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Explore informações sobre aeronaves comerciais, suas especificações e a história de cada modelo.</p>
-		<section class="mt-[34px] grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]" aria-label="Modelos de aeronaves">
-			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Airbus A320neo</h2><p class="text-lg leading-[1.6] text-[#18283b]">Eficiência e conforto para voos de curta e média distância.</p></article>
-			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Boeing 737 MAX 8</h2><p class="text-lg leading-[1.6] text-[#18283b]">Um dos jatos mais conhecidos da aviação comercial moderna.</p></article>
-			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Airbus A350</h2><p class="text-lg leading-[1.6] text-[#18283b]">Longo alcance, tecnologia avançada e cabine ampla.</p></article>
+		<section aria-labelledby="aircraft-title" class="mt-[34px]" id="models-section">
+			<div class="mb-6">
+				<p class="mb-1 text-sm font-semibold uppercase tracking-[2px] text-[#102d55]/70">Explore a frota</p>
+				<h2 id="aircraft-title" class="text-3xl font-bold text-[#102d55] sm:text-4xl">Modelos em destaque</h2>
+			</div>
+			<div class="grid gap-5 md:grid-cols-3">
+				<a href="aircraft/airbus-a320neo.html" class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]" aria-label="Ver informações do Airbus A320neo">
+					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A320neo em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Airbus A320neo</span>
+				</a>
+				<a href="aircraft/boeing-737-max-8.html" class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]" aria-label="Ver informações do Boeing 737 MAX 8">
+					<img src="https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/boeing-737-max-8.jpeg" alt="Boeing 737 MAX 8 em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Boeing 737 MAX 8</span>
+				</a>
+				<a href="aircraft/airbus-a350.html" class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]" aria-label="Ver informações do Airbus A350">
+					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A350 em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Airbus A350</span>
+				</a>
+			</div>
 		</section>
 	</main>
 </body>
