@@ -6,6 +6,190 @@
 	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
 	<title>Modelos | Aviator Info</title>
 	<link rel="stylesheet" href="./dist/tailwind.css">
+	<style>
+		h3.group {
+			position: relative;
+			display: block;
+			width: 100%;
+			overflow: hidden;
+			padding: 1rem 1.35rem;
+			margin: 2.5rem 0 0;
+			border-radius: 12px 12px 0 0;
+			background: #438ff0;
+			color: #000;
+			font-size: clamp(2.2rem, 3vw, 2.9rem);
+			font-weight: 900;
+			letter-spacing: -0.05em;
+			line-height: 1.1;
+			box-shadow: 0 8px 18px rgba(27, 78, 160, 0.18);
+			transition: transform 300ms ease, box-shadow 300ms ease;
+		}
+		h3.group::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(90deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.18) 28%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0) 100%);
+			opacity: 1;
+			transition: opacity 650ms ease;
+			pointer-events: none;
+		}
+		h3.group::after {
+			content: "";
+			position: absolute;
+			top: -18%;
+			right: -30%;
+			height: 140%;
+			width: 42%;
+			background: linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.26) 45%, rgba(255,255,255,0) 100%);
+			transform: translateX(140%) skewX(-18deg);
+			transition: transform 900ms ease;
+			pointer-events: none;
+		}
+		h3.group:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 22px rgba(27, 78, 160, 0.26);
+		}
+		h3.group:hover::before {
+			opacity: 0.4;
+		}
+		h3.group:hover::after {
+			transform: translateX(10%) skewX(-18deg);
+		}
+		#models-section > div.grid {
+			margin-top: 0;
+			background: #edf3fb;
+			padding: 1rem;
+			border-radius: 0 0 12px 12px;
+			box-shadow: 0 10px 20px rgba(2, 6, 23, 0.08);
+		}
+		#models-section article {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+			overflow: hidden;
+			border-radius: 10px;
+			background: rgba(255,255,255,0.92);
+			box-shadow: 0 8px 20px rgba(2, 6, 23, 0.2);
+			transition: transform 200ms ease, box-shadow 200ms ease;
+		}
+		#models-section article:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 14px 28px rgba(2, 6, 23, 0.25);
+		}
+		#models-section article img {
+			display: block;
+			height: 11rem;
+			width: 100%;
+			object-fit: cover;
+			transition: transform 300ms ease;
+		}
+		#models-section article:hover img {
+			transform: scale(1.05);
+		}
+		#models-section article > span {
+			display: block;
+			padding: 1rem 1.25rem 0.5rem;
+			font-size: 1.125rem;
+			font-weight: 800;
+			line-height: 1.3;
+			color: #111827;
+		}
+		.aircraft-card {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.aircraft-title {
+			display: block;
+			padding: 1rem 1.25rem 0.5rem;
+			font-size: 1.125rem;
+			font-weight: 800;
+			line-height: 1.3;
+			color: #111827;
+		}
+		.aircraft-specs {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.5rem;
+			padding: 0 1.25rem 0.35rem;
+			font-size: 0.72rem;
+			color: #1f2937;
+		}
+		.spec {
+			display: flex;
+			flex-direction: column;
+			gap: 0.15rem;
+			padding: 0.35rem 0.4rem;
+			border-radius: 0.5rem;
+			background: #f3f7fb;
+		}
+		.spec span {
+			display: block;
+			font-size: 0.58rem;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #516079;
+		}
+		.spec strong {
+			display: block;
+			font-size: 0.74rem;
+			font-weight: 800;
+			color: #101827;
+		}
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.75rem 1rem;
+			border: 1px solid transparent;
+			border-radius: 9999px;
+			font-size: 0.78rem;
+			font-weight: 800;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, border-color 200ms ease;
+		}
+		.btn-primary {
+			background: #438ff0;
+			color: #ffffff;
+			border-color: #3d87ea;
+			box-shadow: 0 8px 18px rgba(67, 143, 240, 0.2);
+		}
+		.btn-primary:hover {
+			background: #2f7ce4;
+			border-color: #2b72d1;
+			transform: translateY(-1px);
+		}
+		.btn-wide {
+			width: calc(100% - 2.5rem);
+			margin: 0 1.25rem 1rem;
+			margin-top: auto;
+		}
+		.aircraft-details {
+			max-height: 0;
+			overflow: hidden;
+			padding: 0 1.25rem;
+			transition: max-height 260ms ease, padding 260ms ease, opacity 260ms ease;
+			opacity: 0;
+		}
+		.aircraft-card.open .aircraft-details {
+			max-height: 220px;
+			padding: 0 1.25rem 1rem;
+			opacity: 1;
+		}
+		.aircraft-detail-list {
+			margin: 0;
+			padding-left: 1.1rem;
+			color: #1f2937;
+			font-size: 0.76rem;
+			line-height: 1.6;
+		}
+		.aircraft-card.open .more-details-btn {
+			background: #1d4ed8;
+		}
+	</style>
 </head>
 	<body class="m-0 min-h-screen bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
 	<header class="fixed inset-x-0 top-0 z-50 flex min-h-16 items-center bg-[#438ff0] shadow-[0_1px_0_rgba(0,0,0,0.18)]" aria-label="Navegação principal">
@@ -24,21 +208,283 @@
 				<p class="mb-1 text-sm font-semibold uppercase tracking-[2px] text-[#102d55]/70">Explore a frota</p>
 				<h2 id="aircraft-title" class="text-3xl font-bold text-[#102d55] sm:text-4xl">Modelos em destaque</h2>
 			</div>
-			<div class="grid gap-5 md:grid-cols-3">
-				<a href="aircraft/airbus-a320neo.html" class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]" aria-label="Ver informações do Airbus A320neo">
-					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A320neo em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+
+			<!-- Airbus -->
+			<h3 class="group">Airbus</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A320neo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
 					<span class="block px-5 py-4 text-lg font-bold">Airbus A320neo</span>
-				</a>
-				<a href="aircraft/boeing-737-max-8.html" class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]" aria-label="Ver informações do Boeing 737 MAX 8">
-					<img src="https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/boeing-737-max-8.jpeg" alt="Boeing 737 MAX 8 em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
-					<span class="block px-5 py-4 text-lg font-bold">Boeing 737 MAX 8</span>
-				</a>
-				<a href="aircraft/airbus-a350.html" class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]" aria-label="Ver informações do Airbus A350">
-					<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A350 em voo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80" alt="Airbus A330neo" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Airbus A330neo</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80" alt="Airbus A350" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
 					<span class="block px-5 py-4 text-lg font-bold">Airbus A350</span>
-				</a>
+				</article>
+			</div>
+
+			<!-- Boeing -->
+			<h3 class="group">Boeing</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/boeing-737-max-8.jpeg" alt="Boeing 737 MAX 8" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Boeing 737 MAX 8</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80" alt="Boeing 777-300ER" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Boeing 777-300ER</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=80" alt="Boeing 787 Dreamliner" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Boeing 787 Dreamliner</span>
+				</article>
+			</div>
+
+			<!-- Embraer -->
+			<h3 class="group">Embraer</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1556388158-158ea5ccacbd?auto=format&fit=crop&w=1200&q=80" alt="Embraer E175" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Embraer E175</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80" alt="Embraer E190-E2" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Embraer E190-E2</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80" alt="Embraer E195-E2" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Embraer E195-E2</span>
+				</article>
+			</div>
+
+			<!-- McDonnell Douglas -->
+			<h3 class="group">McDonnell Douglas</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80" alt="McDonnell Douglas MD-80" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">MD-80</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=80" alt="McDonnell Douglas MD-11" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">MD-11</span>
+				</article>
+			</div>
+
+			<!-- ATR -->
+			<h3 class="group">ATR</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=1200&q=80" alt="ATR 42-600" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">ATR 42-600</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80" alt="ATR 72-600" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">ATR 72-600</span>
+				</article>
+			</div>
+
+			<!-- Aerospatiale -->
+			<h3 class="group">Aerospatiale</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80" alt="Aerospatiale Caravelle" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Aerospatiale Caravelle</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80" alt="Aerospatiale SA 330 Puma" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">SA 330 Puma</span>
+				</article>
+			</div>
+
+			<!-- Bombardier -->
+			<h3 class="group">Bombardier</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=1200&q=80" alt="Bombardier CRJ700" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Bombardier CRJ700</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=80" alt="Bombardier Q400" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Bombardier Q400</span>
+				</article>
+			</div>
+
+			<!-- Cessna -->
+			<h3 class="group">Cessna</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80" alt="Cessna 172 Skyhawk" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Cessna 172 Skyhawk</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80" alt="Cessna 208 Caravan" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Cessna 208 Caravan</span>
+				</article>
+			</div>
+
+			<!-- Fokker -->
+			<h3 class="group">Fokker</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80" alt="Fokker 50" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Fokker 50</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=1200&q=80" alt="Fokker 100" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Fokker 100</span>
+				</article>
+			</div>
+
+			<!-- Ilyushin -->
+			<h3 class="group">Ilyushin</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=80" alt="Ilyushin Il-76" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Il-76</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80" alt="Ilyushin Il-96" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Il-96</span>
+				</article>
+			</div>
+
+			<!-- Lockheed -->
+			<h3 class="group">Lockheed</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80" alt="Lockheed C-130 Hercules" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">C-130 Hercules</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=1200&q=80" alt="Lockheed L-1011 TriStar" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">L-1011 TriStar</span>
+				</article>
+			</div>
+
+			<!-- SAAB -->
+			<h3 class="group">SAAB</h3>
+			<div class="mt-0 rounded-b-[12px] bg-[#edf3fb] p-4 shadow-[0_10px_20px_rgba(2,6,23,0.08)] grid gap-5 md:grid-cols-3 mb-8">
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80" alt="Saab 340" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Saab 340</span>
+				</article>
+				<article class="group overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]">
+					<img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80" alt="Saab 2000" class="h-44 w-full object-cover transition duration-300 group-hover:scale-105">
+					<span class="block px-5 py-4 text-lg font-bold">Saab 2000</span>
+				</article>
 			</div>
 		</section>
 	</main>
+	<script>
+		const aircraftDetails = {
+			"Airbus A320neo": { tipo: "Widebody", passageiros: "180", autonomia: "6.100 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 2016.", "É uma das famílias mais utilizadas em rotas médias e de alta demanda.", "Seu projeto prioriza eficiência, capacidade e operação econômica."] },
+			"Airbus A330neo": { tipo: "Longo curso", passageiros: "300", autonomia: "12.500 km", velocidade: "Mach 0.86", descricao: ["Produção iniciada em 2018.", "Sua cabine ampla e maior eficiência ajudam em rotas intercontinentais.", "É uma opção muito valorizada por companhias de longo curso."] },
+			"Airbus A350": { tipo: "Longo curso", passageiros: "325", autonomia: "16.100 km", velocidade: "Mach 0.85", descricao: ["Produção iniciada em 2015.", "É conhecida por baixo consumo e cabine silenciosa para longas distâncias.", "Sua tecnologia reforça conforto e alcance em voos de grande extensão."] },
+			"Boeing 737 MAX 8": { tipo: "Single-aisle", passageiros: "178", autonomia: "6.570 km", velocidade: "Mach 0.79", descricao: ["Produção iniciada em 2017.", "É um modelo muito usado em rotas domésticas e regionais de alta frequência.", "Sua proposta combina capacidade, eficiência e operação em alta demanda."] },
+			"Boeing 777-300ER": { tipo: "Longo curso", passageiros: "396", autonomia: "13.650 km", velocidade: "Mach 0.84", descricao: ["Produção iniciada em 2004.", "Destaca-se por grande capacidade e alcance em voos internacionais.", "É uma das aeronaves mais importantes em rotas de alta densidade."] },
+			"Boeing 787 Dreamliner": { tipo: "Longo curso", passageiros: "318", autonomia: "14.140 km", velocidade: "Mach 0.85", descricao: ["Produção iniciada em 2011.", "Sua estrutura leve em compósito reduz peso e melhora a eficiência do combustível.", "É reconhecido pelo conforto da cabine e o desempenho de longo alcance."] },
+			"Embraer E175": { tipo: "Regional", passageiros: "76", autonomia: "3.300 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 2004.", "É muito usada em redes regionais por sua versatilidade e operação econômica.", "Seu tamanho e eficiência o tornam ideal para voos de curta e média distância."] },
+			"Embraer E190-E2": { tipo: "Regional", passageiros: "114", autonomia: "5.500 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 2018.", "Tem cabine mais silenciosa e boa eficiência operacional em rotas médias.", "É uma escolha frequente para mercados com alta necessidade regional."] },
+			"Embraer E195-E2": { tipo: "Regional", passageiros: "136", autonomia: "5.000 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 2019.", "É destaque em rotas densas e de alta demanda com maior conforto a bordo.", "Sua capacidade e economia operacional reforçam a eficiência regional."] },
+			"MD-80": { tipo: "Single-aisle", passageiros: "172", autonomia: "4.000 km", velocidade: "Mach 0.8", descricao: ["Produção iniciada em 1980.", "A família MD-80 foi muito importante na expansão de rotas médias e curtas.", "Seu desenho clássico marcou uma era da aviação comercial."] },
+			"MD-11": { tipo: "Longo curso", passageiros: "293", autonomia: "10.600 km", velocidade: "Mach 0.83", descricao: ["Produção iniciada em 1990.", "Foi um modelo importante para cargas e voos intercontinentais de longa rota.", "Seu uso se destacou em operações de alcance e capacidade de carga."] },
+			"ATR 42-600": { tipo: "Turboélice", passageiros: "50", autonomia: "1.500 km", velocidade: "Mach 0.46", descricao: ["Produção iniciada em 2017.", "É muito eficiente em aeroportos menores e pistas mais curtas.", "Sua operação é valorizada em redes regionais de baixa densidade."] },
+			"ATR 72-600": { tipo: "Turboélice", passageiros: "70", autonomia: "1.900 km", velocidade: "Mach 0.48", descricao: ["Produção iniciada em 2010.", "Faz sucesso em rotas regionais por sua confiabilidade e baixo custo operacional.", "É uma das opções mais reconhecidas para voos de conexão regional."] },
+			"Aerospatiale Caravelle": { tipo: "Jato", passageiros: "140", autonomia: "3.500 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 1959.", "Foi uma aeronave pioneira no conceito de jato comercial de média rota.", "Sua relevância histórica foi fundamental para o desenvolvimento dos jatos comerciais."] },
+			"SA 330 Puma": { tipo: "Helicóptero", passageiros: "18", autonomia: "600 km", velocidade: "220 km/h", descricao: ["Produção iniciada em 1965.", "É conhecida por robustez operacional e uso em transporte e patrulha militar.", "Sua capacidade de suporte e confiabilidade impulsionaram sua longa vida útil."] },
+			"Bombardier CRJ700": { tipo: "Regional", passageiros: "78", autonomia: "3.400 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 2001.", "Faz parte da geração de jatos regionais com alta eficiência operacional.", "Sua utilização é muito comum em rotas com boa demanda de passageiros."] },
+			"Bombardier Q400": { tipo: "Turboélice", passageiros: "86", autonomia: "2.200 km", velocidade: "Mach 0.6", descricao: ["Produção iniciada em 2008.", "É muito respeitada por operar em aeroportos curtos e de baixa demanda.", "Se destaca por conforto, eficiência e boa performance regional."] },
+			"Cessna 172 Skyhawk": { tipo: "Monomotor", passageiros: "4", autonomia: "1.300 km", velocidade: "220 km/h", descricao: ["Produção iniciada em 1956.", "É a aeronave mais produzida da história e símbolo do treinamento de pilotos.", "Sua simplicidade e confiabilidade a tornaram universalmente conhecida."] },
+			"Cessna 208 Caravan": { tipo: "Turboélice", passageiros: "9", autonomia: "1.500 km", velocidade: "300 km/h", descricao: ["Produção iniciada em 1984.", "É muito usada em operações regionais, carga leve e acesso a aeroportos menores.", "Sua versatilidade faz dela um dos modelos mais úteis do segmento."] },
+			"Fokker 50": { tipo: "Turboélice", passageiros: "50", autonomia: "2.200 km", velocidade: "Mach 0.55", descricao: ["Produção iniciada em 1990.", "Foi uma referência em operação regional confiável em pistas curtas.", "Sua confiabilidade ajudou a consolidar a operação em rotas de baixa densidade."] },
+			"Fokker 100": { tipo: "Regional", passageiros: "109", autonomia: "2.600 km", velocidade: "Mach 0.8", descricao: ["Produção iniciada em 1988.", "Era muito utilizada em rotas regionais e de média distância por sua eficiência.", "Sua cabine confortável e operação econômica a fizeram ser bem aceita."] },
+			"Il-76": { tipo: "Carga", passageiros: "140", autonomia: "5.400 km", velocidade: "Mach 0.82", descricao: ["Produção iniciada em 1971.", "É um dos grandes cargueiros do mundo, conhecido por operar em pistas desafiadoras.", "Sua capacidade de carga e alcance o tornaram essencial para operações pesadas."] },
+			"Il-96": { tipo: "Longo curso", passageiros: "300", autonomia: "9.000 km", velocidade: "Mach 0.84", descricao: ["Produção iniciada em 1992.", "Tem forte presença em voos de longa distância e cabine ampla para passageiros.", "A aeronave se destacou em rotas internacionais de grande alcance."] },
+			"C-130 Hercules": { tipo: "Transporte militar", passageiros: "92", autonomia: "3.800 km", velocidade: "Mach 0.6", descricao: ["Produção iniciada em 1954.", "É um dos transportes militares mais versáteis do mundo, com grande confiabilidade.", "Sua capacidade de operação em pistas curtas o torna extremamente útil."] },
+			"L-1011 TriStar": { tipo: "Longo curso", passageiros: "400", autonomia: "8.500 km", velocidade: "Mach 0.84", descricao: ["Produção iniciada em 1972.", "Foi um dos grandes trijatos de longo curso do seu período, com forte alcance internacional.", "Sua cabine ampla e capacidade em voos de longo curso fizeram seu nome."] },
+			"Saab 340": { tipo: "Turboélice", passageiros: "34", autonomia: "1.200 km", velocidade: "Mach 0.5", descricao: ["Produção iniciada em 1990.", "Tem boa aceitação em redes regionais por seu conforto e operação eficiente.", "Sua proposta é bem alinhada com voos curtos e de boa ocupação."] },
+			"Saab 2000": { tipo: "Turboélice", passageiros: "50", autonomia: "2.000 km", velocidade: "Mach 0.6", descricao: ["Produção iniciada em 1994.", "Foi desenvolvido para atender rotas regionais com conforto e boa performance.", "Seu design reforça a eficiência em operações de conexão regional."] }
+		};
+
+		const modelCards = document.querySelectorAll('#models-section article');
+		modelCards.forEach((card) => {
+			const title = card.querySelector('span');
+			if (!title) return;
+
+			const aircraftName = title.textContent.trim();
+			const details = aircraftDetails[aircraftName] || {
+				tipo: "Aeronave",
+				passageiros: "--",
+				autonomia: "--",
+				velocidade: "--",
+				descricao: ["Detalhes disponíveis em breve."]
+			};
+
+			card.classList.add('group', 'flex', 'h-full', 'flex-col');
+			title.classList.add('block', 'px-5', 'pb-2', 'pt-4', 'text-center', 'text-lg', 'font-extrabold', 'leading-tight', 'text-slate-900');
+
+			const specBlock = document.createElement('div');
+			specBlock.className = 'px-5 pb-2';
+			specBlock.innerHTML = `
+				<div class="overflow-hidden rounded-lg border border-slate-300 bg-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+					<div class="grid grid-cols-2 border-b border-slate-300 bg-slate-200 text-[0.56rem] font-bold uppercase tracking-[0.08em] text-slate-700">
+						<span class="border-r border-slate-300 px-2 py-2 text-center">Tipo</span>
+						<span class="px-2 py-2 text-center">Passageiros</span>
+					</div>
+					<div class="grid grid-cols-2 border-b border-slate-300 bg-white text-[0.72rem] font-semibold text-slate-800">
+						<span class="border-r border-slate-300 px-2 py-2 text-center">${details.tipo}</span>
+						<span class="px-2 py-2 text-center">${details.passageiros}</span>
+					</div>
+					<div class="grid grid-cols-2 border-b border-slate-300 bg-slate-200 text-[0.56rem] font-bold uppercase tracking-[0.08em] text-slate-700">
+						<span class="border-r border-slate-300 px-2 py-2 text-center">Autonomia</span>
+						<span class="px-2 py-2 text-center">Velocidade</span>
+					</div>
+					<div class="grid grid-cols-2 bg-white text-[0.72rem] font-semibold text-slate-800">
+						<span class="border-r border-slate-300 px-2 py-2 text-center">${details.autonomia}</span>
+						<span class="px-2 py-2 text-center">${details.velocidade}</span>
+					</div>
+				</div>
+			`;
+
+			const detailPanel = document.createElement('div');
+			detailPanel.className = 'max-h-0 overflow-hidden px-5 opacity-0 transition-all duration-300';
+			detailPanel.innerHTML = `
+				<div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+					<div class="bg-slate-100 px-3 py-2 text-[0.58rem] font-bold uppercase tracking-[0.08em] text-slate-600">Observações</div>
+					<ul class="m-0 list-disc space-y-1 px-5 py-3 text-[0.76rem] leading-5 text-slate-700">
+						${details.descricao.map((item) => `<li>${item}</li>`).join('')}
+					</ul>
+				</div>
+			`;
+
+			const toggleButton = document.createElement('button');
+			toggleButton.type = 'button';
+			toggleButton.className = 'btn btn-primary btn-wide';
+			toggleButton.textContent = 'Mais Detalhes';
+			toggleButton.setAttribute('aria-expanded', 'false');
+			toggleButton.addEventListener('click', () => {
+				const isOpen = card.classList.toggle('open');
+				toggleButton.setAttribute('aria-expanded', String(isOpen));
+				detailPanel.style.maxHeight = isOpen ? '220px' : '0px';
+				detailPanel.style.opacity = isOpen ? '1' : '0';
+				detailPanel.style.padding = isOpen ? '0 1.25rem 1rem' : '0 1.25rem';
+				toggleButton.classList.toggle('btn-primary', true);
+				if (isOpen) {
+					toggleButton.style.background = '#1d4ed8';
+					toggleButton.style.borderColor = '#1e40af';
+				} else {
+					toggleButton.style.background = '#438ff0';
+					toggleButton.style.borderColor = '#3d87ea';
+				}
+			});
+
+			card.appendChild(specBlock);
+			card.appendChild(toggleButton);
+			card.appendChild(detailPanel);
+		});
+	</script>
 </body>
 </html>
