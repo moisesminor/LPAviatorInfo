@@ -12,7 +12,7 @@ const airportPhotos = {
 	NAT: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Aeroporto_S%C3%A3o_Gon%C3%A7alo_guich%C3%AAs.jpg',
 	FLN: 'https://upload.wikimedia.org/wikipedia/commons/3/31/Sem-t-tulo3.png',
 	AJU: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Sagu%C3%A3o_do_Aeroporto_de_Aracaju.jpg',
-	PMW: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80'
+	PMW: 'https://afnoticias.com.br/static/cache/2026/438a56df5e0d09bd4abbcaf5327294c4.jpg'
 };
 
 const remainingAirports = [
