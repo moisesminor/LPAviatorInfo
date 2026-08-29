@@ -7,33 +7,52 @@
 	<title>Aviator Info</title>
 	<link rel="stylesheet" href="./dist/tailwind.css">
 </head>
-	<body class="m-0 min-h-screen bg-gradient-to-b from-slate-50 to-blue-500 pt-[74px] font-sans">
+	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-[74px] font-sans">
 	<header class="fixed inset-x-0 top-0 z-50 flex min-h-16 items-center bg-[#438ff0] shadow-[0_1px_0_rgba(0,0,0,0.18)]" aria-label="Navegação principal">
 		<a class="absolute left-[18px] top-1 flex h-14 w-[66px] items-center justify-center max-sm:left-1" href="./index.html" aria-label="Ir para a página principal">
 			<img class="block h-14 w-[62px] object-contain" src="./images/AviatorLogo.png" alt="Aviator Info">
 		</a>
-		<nav class="flex w-full items-center justify-center gap-1 px-1 pl-[78px] sm:gap-[clamp(28px,15vw,220px)] sm:px-[100px] sm:pl-[100px]">
-			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./modelos.html">Modelos</a>
-			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./aeroportos.html">Aeroportos</a>
-			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./companhias.html">Companhias</a>
+		<nav class="flex w-full items-center justify-center gap-0.5 px-1 pl-[78px] sm:gap-[clamp(28px,15vw,220px)] sm:px-[100px] sm:pl-[100px]">
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(12px,4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./modelos.html">Modelos</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(12px,4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./aeroportos.html">Aeroportos</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(12px,4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./companhias.html">Companhias</a>
 		</nav>
 	</header>
 	<main class="min-h-screen px-5 py-12">
 		<div class="mx-auto flex max-w-[1100px] flex-col gap-14">
-		<section class="grid items-center gap-7 rounded-[14px] bg-gradient-to-b from-white/[0.02] to-transparent p-7 lg:grid-cols-[1fr_520px]" aria-labelledby="home-title">
-			<div>
-				<h1 id="home-title" class="mb-2 text-[32px] font-bold tracking-[0.4px] text-blue-600 sm:text-5xl">Aviator Info</h1>
-				<p class="mb-[18px] text-lg leading-[1.5] text-slate-900">Informações sobre modelos de aeronaves: especificações, história e curiosidades para entusiastas e profissionais da aviação.</p>
-				<a class="inline-block rounded-[10px] bg-blue-600 px-4 py-2.5 font-semibold text-slate-50 transition active:scale-[.98] active:opacity-95" href="modelos.html">Explorar modelos</a>
+
+		<section class="relative isolate overflow-hidden rounded-[24px] bg-gradient-to-br from-[#0a1830] via-[#102a52] to-[#1a3f78] px-6 py-16 sm:py-24" id="hero" aria-labelledby="home-title">
+			<div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+				<div class="hero-glow absolute left-1/2 top-1/2 h-[520px] w-[520px] rounded-full bg-sky-400/25 blur-[110px]"></div>
 			</div>
 
+			<div class="mx-auto grid max-w-[1100px] items-center gap-10 lg:grid-cols-[1fr_1fr]">
+				<div class="text-center lg:text-left">
+					<span class="inline-block rounded-full border border-white/20 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[2px] text-sky-200">Aviação em detalhes</span>
+					<h1 id="home-title" class="mt-4 text-4xl font-extrabold leading-tight text-white sm:text-6xl">Descubra o mundo da <span class="text-sky-300">aviação</span></h1>
+					<p class="mx-auto mt-4 max-w-md text-lg leading-relaxed text-blue-100/80 lg:mx-0">Modelos de aeronaves, aeroportos e companhias aéreas em um só lugar — dados completos para quem vive e respira aviação.</p>
+					<div class="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+						<a class="inline-block rounded-[10px] bg-sky-400 px-6 py-3 font-semibold text-[#0a1830] transition active:scale-[.98] active:opacity-95 hover:bg-sky-300" href="./modelos.html">Explorar modelos</a>
+						<a class="inline-block rounded-[10px] border border-white/25 px-6 py-3 font-semibold text-white transition active:scale-[.98] hover:bg-white/10" href="./aeroportos.html">Ver aeroportos</a>
+					</div>
+				</div>
+
+				<div class="relative flex justify-center [perspective:1000px]" id="hero-plane-wrap">
+					<div id="hero-plane-tilt" class="transition-transform duration-200 ease-out">
+						<img src="./images/Aviao.png" alt="Ilustração de avião comercial visto de baixo, em curva" class="hero-plane w-full max-w-[380px] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] sm:max-w-[480px]" id="hero-plane">
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section aria-labelledby="highlights-title">
+			<h2 id="highlights-title" class="mb-4 text-2xl font-bold text-blue-700">Em destaque</h2>
 			<aside class="grid grid-cols-2 gap-3" aria-hidden="false">
 				<img src="https://www.aircraft.airbus.com/sites/g/files/jlcbta126/files/styles/w1200h675/public/2025-10/Aircraft.Airbus%20Figma%20Images%20V2_A320neo.png?h=eb58b4d6&itok=m1AYlns4" alt="Airbus A320Neo em voo" class="col-span-2 h-[140px] w-full rounded-[10px] border border-slate-950 object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[300px]">
 				<img src="https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/boeing-737-max-8.jpeg" alt="Boeing 737 MAX-8 em voo" class="h-[140px] w-full rounded-[10px] border border-slate-950 object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[170px]">
 				<img src="https://de2y7ybiap967.cloudfront.net/images/com_hikashop/upload/thumbnails/1000x1000/img_1252.jpg" alt="Cockpit de A320" class="h-[140px] w-full rounded-[10px] border border-slate-950 object-cover shadow-[0_8px_20px_rgba(2,6,23,0.6)] sm:h-[170px]">
 			</aside>
 		</section>
-
 
 		</div>
 	</main>
@@ -44,6 +63,26 @@
 
 	<script>
 		document.getElementById('year').textContent = new Date().getFullYear();
+
+		// Efeito de paralaxe 3D no avião do hero, seguindo o cursor do mouse
+		(function(){
+			const wrap = document.getElementById('hero-plane-wrap');
+			const tilt = document.getElementById('hero-plane-tilt');
+			if(!wrap || !tilt) return;
+			if(!window.matchMedia('(pointer: fine)').matches) return;
+			if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+			wrap.addEventListener('mousemove', (event) => {
+				const rect = wrap.getBoundingClientRect();
+				const x = (event.clientX - rect.left) / rect.width - 0.5;
+				const y = (event.clientY - rect.top) / rect.height - 0.5;
+				tilt.style.transform = `rotateY(${x * 18}deg) rotateX(${y * -18}deg)`;
+			});
+
+			wrap.addEventListener('mouseleave', () => {
+				tilt.style.transform = 'rotateY(0deg) rotateX(0deg)';
+			});
+		})();
 
 		// Animação de entrada para a seção de modelos usando IntersectionObserver
 		(function(){

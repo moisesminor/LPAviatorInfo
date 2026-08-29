@@ -3,100 +3,142 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="description" content="Explore aeroportos do Brasil com códigos IATA e ICAO, coordenadas, pistas e mapa — dados atualizados para entusiastas e profissionais da aviação.">
+	<meta property="og:title" content="Aeroportos do Brasil | Aviator Info">
+	<meta property="og:description" content="Códigos, localização, pistas e mapa de aeroportos brasileiros em um só lugar.">
+	<meta property="og:type" content="website">
 	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
-	<title>Aeroportos | Aviator Info</title>
+	<title>Aeroportos do Brasil | Aviator Info</title>
 	<link rel="stylesheet" href="./dist/tailwind.css">
 	<style>
-		.airport-card { align-self: start; height: 400px; transition: height 420ms ease; }
-		.airport-card.is-expanded { height: 920px; }
-		.airport-card > img { display: block; width: 100%; height: 192px; min-height: 192px; max-height: 192px; object-fit: cover; }
-		.airport-card > div:last-child { display: flex; min-height: 208px; flex-direction: column; }
-		.airport-card details { margin-top: auto !important; }
-		.airport-card details > summary { min-height: 44px; justify-content: center; }
-		.airport-card summary::-webkit-details-marker { display: none; }
-		.airport-card details > summary { display: inline-flex; align-items: center; cursor: pointer; list-style: none; border: 1px solid transparent; border-radius: 0.375rem; background: #1261bd; padding: 0.625rem 1rem; color: #fff; font-size: 0.875rem; font-weight: 500; line-height: 1.25rem; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
-		.airport-card details > summary { font-size: 0; }
-		.airport-card details > summary::before { content: 'Mostrar mais detalhes'; font-size: 0.875rem; }
-		.airport-card details.is-open > summary::before { content: 'Mostrar menos detalhes'; }
-		.airport-card details > summary::after { width: 0.5rem; height: 0.5rem; margin-left: 0.375rem; border-right: 2px solid currentColor; border-top: 2px solid currentColor; content: ''; transform: rotate(45deg); }
-		.airport-card details > summary:hover { background: #102d55; }
-		.airport-card details.is-open > summary::after { transform: rotate(135deg); }
-		.airport-card details > summary:focus { outline: none; box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.8); }
-		.airport-card .airport-details { display: block; max-height: 0; overflow: hidden; opacity: 0; transition: max-height 420ms ease, opacity 260ms ease; }
-		.airport-card details.is-open .airport-details { max-height: 270px; overflow-y: auto; opacity: 1; }
-		.airport-card details.is-closing .airport-details { max-height: 0; opacity: 0; }
+		@font-face {
+			font-family: 'Plus Jakarta Sans';
+			font-style: normal;
+			font-weight: 500;
+			font-display: swap;
+			src: url('./fonts/plus-jakarta-sans-500.woff2') format('woff2');
+		}
+		@font-face {
+			font-family: 'Plus Jakarta Sans';
+			font-style: normal;
+			font-weight: 600;
+			font-display: swap;
+			src: url('./fonts/plus-jakarta-sans-600.woff2') format('woff2');
+		}
+		@font-face {
+			font-family: 'Plus Jakarta Sans';
+			font-style: normal;
+			font-weight: 700;
+			font-display: swap;
+			src: url('./fonts/plus-jakarta-sans-700.woff2') format('woff2');
+		}
+		@font-face {
+			font-family: 'Plus Jakarta Sans';
+			font-style: normal;
+			font-weight: 800;
+			font-display: swap;
+			src: url('./fonts/plus-jakarta-sans-800.woff2') format('woff2');
+		}
+		body.font-brand { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif; }
+
+		.skip-link { position: absolute; left: 1rem; top: -3rem; z-index: 60; border-radius: 0.5rem; background: #102d55; padding: 0.625rem 1rem; font-weight: 600; color: #fff; transition: top 200ms ease; }
+		.skip-link:focus { top: 1rem; }
+
+		.hero-glow { position: absolute; inset: -140px -10% auto -10%; height: 460px; z-index: 0; pointer-events: none; background: radial-gradient(55% 100% at 28% 0%, rgba(67, 143, 240, 0.32), rgba(67, 143, 240, 0) 70%), radial-gradient(38% 80% at 88% 15%, rgba(18, 97, 189, 0.22), rgba(18, 97, 189, 0) 70%); }
+
+		.country-filter-btn[aria-pressed="true"] { background: #1261bd; color: #fff; box-shadow: 0 6px 16px rgba(16, 45, 85, 0.25); }
+		.country-filter-btn:not([aria-pressed="true"]):hover { background: rgba(18, 97, 189, 0.08); }
+
+		.airport-card { position: relative; transition: box-shadow 380ms ease, transform 300ms ease; }
+		.airport-card[data-open="true"] { box-shadow: 0 20px 40px rgba(16, 45, 85, 0.18); }
+		.airport-card .details-icon { transform: rotate(0deg); transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1); }
+		.airport-card[data-open="true"] .details-icon { transform: rotate(180deg); }
+		.airport-card .details-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 420ms cubic-bezier(0.4, 0, 0.2, 1); }
+		.airport-card[data-open="true"] .details-wrap { grid-template-rows: 1fr; }
+		.airport-card .details-inner { overflow: hidden; min-height: 0; }
+		.airport-card .details-content { border-top-color: transparent; opacity: 0; transform: translateY(-8px) scale(0.98); transition: opacity 280ms ease, transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1), border-top-color 320ms ease; transform-origin: top center; }
+		.airport-card[data-open="true"] .details-content { border-top-color: rgb(226 232 240); opacity: 1; transform: translateY(0) scale(1); transition-delay: 150ms; }
+
+		.skeleton-card { border-radius: 1rem; border: 1px solid rgba(15, 23, 42, 0.08); background: #fff; overflow: hidden; }
+		.skeleton-shine { position: relative; overflow: hidden; background: #e6ecf5; }
+		.skeleton-shine::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent); animation: skeleton-sweep 1.6s ease-in-out infinite; }
+		@keyframes skeleton-sweep { 100% { transform: translateX(100%); } }
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+		}
 	</style>
 </head>
-	<body class="m-0 min-h-screen bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+	<body class="font-brand m-0 min-h-screen overflow-x-hidden bg-slate-50 pt-16 antialiased">
+	<a class="skip-link" href="#main-content">Pular para o conteúdo</a>
 	<header class="fixed inset-x-0 top-0 z-50 flex min-h-16 items-center bg-[#438ff0] shadow-[0_1px_0_rgba(0,0,0,0.18)]" aria-label="Navegação principal">
 		<a class="absolute left-[18px] top-1 flex h-14 w-[66px] items-center justify-center max-sm:left-1" href="./index.html" aria-label="Ir para a página principal"><img class="block h-14 w-[62px] object-contain" src="./images/AviatorLogo.png" alt="Aviator Info"></a>
-		<nav class="flex w-full items-center justify-center gap-1 px-1 pl-[78px] sm:gap-[clamp(28px,15vw,220px)] sm:px-[100px] sm:pl-[100px]">
-			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./modelos.html">Modelos</a>
-			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-black no-underline transition sm:px-[18px] sm:py-2.5" href="./aeroportos.html" aria-current="page">Aeroportos</a>
-			<a class="border-2 border-transparent px-[5px] py-[9px] !text-[20px] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5" href="./companhias.html">Companhias</a>
+		<nav class="flex w-full items-center justify-center gap-0.5 px-1 pl-[78px] sm:gap-[clamp(28px,15vw,220px)] sm:px-[100px] sm:pl-[100px]">
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(12px,4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./modelos.html">Modelos</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(12px,4vw,20px)] font-normal leading-none text-black no-underline transition sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./aeroportos.html" aria-current="page">Aeroportos</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(12px,4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./companhias.html">Companhias</a>
 		</nav>
 	</header>
-	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
-		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Aeroportos</h1>
-		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Conheça aeroportos importantes, seus códigos, localização e estrutura para receber passageiros do mundo todo.</p>
-		<section class="mt-[34px] grid items-start gap-5 md:grid-cols-3" aria-label="Aeroportos em destaque">
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://www.carpemundi.com.br/wp-content/uploads/2019/03/dicas-aeroporto-de-guarulhos.jpg" alt="Aeroporto Internacional de Guarulhos, São Paulo" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Guarulhos <span class="text-[#1261bd]">(GRU)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">O principal aeroporto internacional de São Paulo.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBGR</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de São Paulo/Guarulhos - Governador André Franco Montoro fica em Cumbica, Guarulhos. É o maior hub de conexões domésticas e internacionais do Brasil, com quatro terminais e funcionamento 24 horas.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Rod. Hélio Smidt, s/n, Cumbica, Guarulhos - SP<br><strong>Coordenadas:</strong> -23.4356, -46.4731</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Guarulhos" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Guarulhos no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Guarulhos&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Aeroporto_galeao_rj_ME.jpg" alt="Aeroporto Internacional do Rio de Janeiro, Galeão" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Galeão <span class="text-[#1261bd]">(GIG)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Uma das principais portas de entrada do Rio de Janeiro.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBGL</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional Tom Jobim, conhecido como Galeão, fica na Ilha do Governador e atende voos nacionais e internacionais. Seu pátio amplo e suas pistas longas permitem receber aeronaves de grande porte.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Vinte de Janeiro, s/n, Ilha do Governador, Rio de Janeiro - RJ<br><strong>Coordenadas:</strong> -22.8099, -43.2506</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+Tom+Jobim" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto do Galeão no Google Maps" src="https://www.google.com/maps?q=Aeroporto+do+Galeao+Rio+de+Janeiro&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/6/60/Aeroporto_de_Congonhas_-_Aeronaves.jpg" alt="Aeronaves no Aeroporto de Congonhas em São Paulo" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Congonhas <span class="text-[#1261bd]">(CGH)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">O aeroporto urbano de São Paulo, no coração da cidade.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBSP</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto de São Paulo/Congonhas - Deputado Freitas Nobre opera principalmente voos domésticos. Fica em Vila Congonhas e oferece acesso rápido às regiões central e sul da capital, sendo um dos terminais mais movimentados do país.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Washington Luís, s/n, Vila Congonhas, São Paulo - SP<br><strong>Coordenadas:</strong> -23.6261, -46.6564</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+de+Congonhas" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Congonhas no Google Maps" src="https://www.google.com/maps?q=Aeroporto+de+Congonhas&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Brasilia_airport_terminal.jpg" alt="Terminal do Aeroporto Internacional de Brasília" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Brasília <span class="text-[#1261bd]">(BSB)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Importante centro de conexões entre as regiões brasileiras.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBBR</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Brasília - Presidente Juscelino Kubitschek é um dos principais hubs aéreos do país. Sua posição central facilita conexões entre Norte, Nordeste, Sul e Sudeste, além de atender a capital federal.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Área Especial de Aeroporto, Lago Sul, Brasília - DF<br><strong>Coordenadas:</strong> -15.8711, -47.9186</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Brasilia" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Brasília no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Brasilia&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Recife_airport.jpg" alt="Aeroporto Internacional do Recife" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Recife <span class="text-[#1261bd]">(REC)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Uma das principais portas de entrada do Nordeste.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBRF</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional do Recife/Guararapes - Gilberto Freyre atende a Região Metropolitana do Recife e funciona como importante conexão para destinos nacionais e internacionais no Nordeste.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Praça Ministro Salgado Filho, s/n, Imbiribeira, Recife - PE<br><strong>Coordenadas:</strong> -8.1265, -34.9236</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+do+Recife" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto do Recife no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+do+Recife&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Salvador_Bahia_Airport_-_SSA.jpg" alt="Aeroporto Internacional de Salvador" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Salvador <span class="text-[#1261bd]">(SSA)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Principal aeroporto da Bahia e do litoral nordestino.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBSV</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Salvador - Deputado Luís Eduardo Magalhães é o principal terminal aéreo da Bahia. Atende o turismo, os negócios e as conexões para diversas cidades do Brasil e do exterior.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Praça Gago Coutinho, s/n, São Cristóvão, Salvador - BA<br><strong>Coordenadas:</strong> -12.9086, -38.3225</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Salvador" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Salvador no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Salvador&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Aeroporto_Salgado_Filho_de_Porto_Alegre.jpg" alt="Aeroporto Internacional Salgado Filho em Porto Alegre" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Porto Alegre <span class="text-[#1261bd]">(POA)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">O principal terminal aéreo do Sul do Brasil.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBPA</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional Salgado Filho é o principal aeroporto do Rio Grande do Sul. Localizado na zona norte de Porto Alegre, atende a capital e sua região metropolitana com voos domésticos e internacionais.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Severo Dullius, 90.010, São João, Porto Alegre - RS<br><strong>Coordenadas:</strong> -29.9939, -51.1711</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+Salgado+Filho" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Porto Alegre no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Salgado+Filho+Porto+Alegre&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Vista_do_Aeroporto_Internacional_de_Fortaleza_Pinto_Martins.jpg/1280px-Vista_do_Aeroporto_Internacional_de_Fortaleza_Pinto_Martins.jpg" alt="Vista do Aeroporto Internacional de Fortaleza Pinto Martins" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Fortaleza <span class="text-[#1261bd]">(FOR)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Uma das principais portas de entrada do Nordeste.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBFZ</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Fortaleza - Pinto Martins conecta o Ceará a várias capitais brasileiras e destinos internacionais. Sua localização urbana facilita o acesso à capital e ao litoral cearense.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Senador Carlos Jereissati, 3000, Serrinha, Fortaleza - CE<br><strong>Coordenadas:</strong> -3.7763, -38.5326</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Fortaleza" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Fortaleza no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Fortaleza&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Manaus_International_Airport.jpg" alt="Aeroporto Internacional de Manaus" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Manaus <span class="text-[#1261bd]">(MAO)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Principal hub aéreo da Amazônia.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBEG</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional Eduardo Gomes é a principal ligação aérea do Amazonas e um importante centro logístico da região Norte, atendendo Manaus e a floresta amazônica.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Santos Dumont, 1350, Tarumã, Manaus - AM<br><strong>Coordenadas:</strong> -3.0386, -60.0497</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+Eduardo+Gomes" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Manaus no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+Eduardo+Gomes&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/A330-200_TAP_%28CS-TOH%29_Star_Alliance_scheme%2C_arriving_in_Belem_PA.jpg" alt="Aeronave chegando ao aeroporto de Belém" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Belém <span class="text-[#1261bd]">(BEL)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Porta de entrada da Amazônia Oriental.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBBE</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Belém - Val-de-Cans/Júlio Cezar Ribeiro é um dos principais terminais da Amazônia Oriental e atende o Pará com voos nacionais e internacionais.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Júlio César, s/n, Val-de-Cans, Belém - PA<br><strong>Coordenadas:</strong> -1.3793, -48.4763</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Belem" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Belém no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Belem&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/d/dc/Aeroporto_Internacional_de_Porto_Velho.jpg" alt="Aeroporto Internacional de Porto Velho" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Porto Velho <span class="text-[#1261bd]">(PVH)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Terminal estratégico de Rondônia.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBPV</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional Governador Jorge Teixeira de Oliveira atende Porto Velho e funciona como elo aéreo para Rondônia e áreas do oeste amazônico.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Av. Governador Jorge Teixeira, s/n, Porto Velho - RO<br><strong>Coordenadas:</strong> -8.7093, -63.9023</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Porto+Velho" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Porto Velho no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Porto+Velho&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Riobranco_aeroporto.jpg" alt="Aeroporto Internacional de Rio Branco" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Rio Branco <span class="text-[#1261bd]">(RBR)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Principal conexão aérea do Acre.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBRB</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Rio Branco - Plácido de Castro é a principal porta de entrada aérea do Acre e conecta a capital acreana a outros centros do Brasil.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> BR-364, km 18, Rio Branco - AC<br><strong>Coordenadas:</strong> -9.8689, -67.8981</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Rio+Branco" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Rio Branco no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Rio+Branco&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Aeroporto_Internacional_de_Macap%C3%A1.jpg" alt="Aeroporto Internacional de Macapá" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Macapá <span class="text-[#1261bd]">(MCP)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Conexão aérea estratégica do Amapá.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBMQ</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Macapá - Alberto Alcolumbre atende a capital do Amapá e é essencial para a mobilidade de passageiros e cargas na região amazônica.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Rua Hildemar Maia, s/n, Santa Rita, Macapá - AP<br><strong>Coordenadas:</strong> 0.0507, -51.0720</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Macapa" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Macapá no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Macapa&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
-			<article class="airport-card overflow-hidden rounded-lg border border-slate-900/15 bg-white/[0.9] shadow-[0_8px_20px_rgba(2,6,23,0.12)]">
-				<img class="h-48 w-full object-cover" src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Entrada_do_Aeroporto_Internacional_de_Boa_Vista_-_Atlas_Brasil_Cantanhede%2C_Boa_Vista_RR.jpg" alt="Entrada do Aeroporto Internacional de Boa Vista" loading="lazy">
-				<div class="p-6"><div class="flex items-start justify-between gap-3"><div><h2 class="text-2xl font-bold text-[#102d55]">Boa Vista <span class="text-[#1261bd]">(BVB)</span></h2><p class="mt-2 text-lg leading-[1.6] text-[#18283b]">Principal aeroporto de Roraima.</p></div><span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-[#1261bd]">SBBV</span></div><details class="mt-5 border-t border-slate-200 pt-4"><summary class="flex cursor-pointer list-none items-center justify-between font-bold text-[#1261bd]">Mais detalhes <span class="transition" aria-hidden="true">+</span></summary><div class="airport-details mt-4 hidden"><p class="leading-7 text-slate-700">O Aeroporto Internacional de Boa Vista - Atlas Brasil Cantanhede é o principal terminal aéreo de Roraima e conecta a capital aos grandes centros do país.</p><p class="mt-3 text-sm leading-6 text-slate-600"><strong>Localização:</strong> Praça do Centro Cívico, s/n, Aeroporto, Boa Vista - RR<br><strong>Coordenadas:</strong> 2.8463, -60.6901</p><a class="mt-4 inline-block font-bold text-[#1261bd] underline" href="https://www.google.com/maps/search/?api=1&query=Aeroporto+Internacional+de+Boa+Vista" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a><iframe class="mt-4 h-44 w-full rounded-md border-0" title="Localização do Aeroporto de Boa Vista no Google Maps" src="https://www.google.com/maps?q=Aeroporto+Internacional+de+Boa+Vista&output=embed" loading="lazy"></iframe></div></details></div>
-			</article>
+	<main id="main-content" class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+		<section class="relative overflow-hidden rounded-2xl">
+			<div class="hero-glow" aria-hidden="true"></div>
+			<div class="relative z-10">
+				<div class="country-filter mb-4 inline-flex items-center gap-1 rounded-full border border-slate-900/10 bg-white/70 p-1 shadow-sm backdrop-blur-sm" role="group" aria-label="Filtrar aeroportos por país">
+					<button type="button" class="country-filter-btn rounded-full px-4 py-2 text-sm font-semibold text-[#1261bd] transition" data-country="brasil" aria-pressed="true">🇧🇷 Brasil</button>
+					<button type="button" class="country-filter-btn rounded-full px-4 py-2 text-sm font-semibold text-[#1261bd] transition" data-country="usa" aria-pressed="false">🇺🇸 Estados Unidos</button>
+				</div>
+				<h1 id="page-title" class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-extrabold tracking-tight text-[#102d55]">Aeroportos do Brasil</h1>
+				<p id="page-subtitle" class="max-w-[62ch] text-lg leading-[1.6] text-[#18283b]">Códigos IATA e ICAO, localização, pistas e mapa de cada aeroporto brasileiro — dados atualizados para consulta rápida.</p>
+				<p id="airport-count" class="mt-3 text-sm font-medium text-[#1261bd]" aria-live="polite"></p>
+			</div>
 		</section>
+
+		<section class="mt-8 max-w-md" aria-label="Pesquisar aeroporto por cidade">
+			<label for="airport-search" class="sr-only">Pesquisar por cidade</label>
+			<div class="relative">
+				<svg class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M14 14L18 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+				<input type="search" id="airport-search" placeholder="Pesquisar por cidade..." autocomplete="off" class="w-full rounded-xl border border-slate-900/10 bg-white py-3 pl-11 pr-4 text-base text-[#102d55] shadow-[0_8px_24px_rgba(16,45,85,0.08)] placeholder:text-slate-400 focus:border-[#1261bd] focus:outline-none focus:ring-2 focus:ring-[#1261bd]/30">
+			</div>
+		</section>
+
+		<section class="mt-8 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-label="Lista de aeroportos brasileiros" id="airport-grid">
+			<div class="skeleton-card" data-skeleton>
+				<div class="skeleton-shine h-48 w-full"></div>
+				<div class="space-y-3 p-6">
+					<div class="skeleton-shine h-5 w-3/4 rounded"></div>
+					<div class="skeleton-shine h-4 w-full rounded"></div>
+					<div class="skeleton-shine h-4 w-5/6 rounded"></div>
+					<div class="skeleton-shine mt-4 h-10 w-full rounded-xl"></div>
+				</div>
+			</div>
+			<div class="skeleton-card" data-skeleton>
+				<div class="skeleton-shine h-48 w-full"></div>
+				<div class="space-y-3 p-6">
+					<div class="skeleton-shine h-5 w-3/4 rounded"></div>
+					<div class="skeleton-shine h-4 w-full rounded"></div>
+					<div class="skeleton-shine h-4 w-5/6 rounded"></div>
+					<div class="skeleton-shine mt-4 h-10 w-full rounded-xl"></div>
+				</div>
+			</div>
+			<div class="skeleton-card" data-skeleton>
+				<div class="skeleton-shine h-48 w-full"></div>
+				<div class="space-y-3 p-6">
+					<div class="skeleton-shine h-5 w-3/4 rounded"></div>
+					<div class="skeleton-shine h-4 w-full rounded"></div>
+					<div class="skeleton-shine h-4 w-5/6 rounded"></div>
+					<div class="skeleton-shine mt-4 h-10 w-full rounded-xl"></div>
+				</div>
+			</div>
+		</section>
+
+		<div id="grid-status" class="sr-only" role="status" aria-live="polite"></div>
+
+		<div class="mt-10 flex flex-col items-center gap-3">
+			<button id="load-more-btn" type="button" class="rounded-xl bg-[#1261bd] px-6 py-3 text-base font-semibold text-white shadow-[0_8px_20px_rgba(16,45,85,0.18)] transition duration-200 hover:bg-[#102d55] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60">
+				Carregar mais 20
+			</button>
+			<p id="load-more-error" class="hidden text-sm font-medium text-rose-700" role="alert"></p>
+		</div>
 	</main>
 	<script src="./aeroportos.js"></script>
 </body>
