@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="description" content="Simule o tempo de voo entre aeroportos com base no modelo de aeronave escolhido.">
+	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<title>Simulação | Aviator Info</title>
+	<link rel="stylesheet" href="./dist/tailwind.css">
+	<style>
+		.sim-select {
+			width: 100%;
+			border-radius: 0.75rem;
+			border: 1px solid rgba(15, 23, 42, 0.12);
+			background: #fff;
+			padding: 0.7rem 0.9rem;
+			font-size: 0.95rem;
+			color: #102d55;
+			box-shadow: 0 6px 16px rgba(16, 45, 85, 0.06);
+		}
+		.sim-select:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+		.sim-select:focus { outline: none; border-color: #1261bd; box-shadow: 0 0 0 3px rgba(18, 97, 189, 0.2); }
+
+		.aircraft-pick {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			gap: 0.35rem;
+			border-radius: 0.9rem;
+			border: 2px solid rgba(15, 23, 42, 0.1);
+			background: #fff;
+			padding: 0.85rem 1rem;
+			text-align: left;
+			cursor: pointer;
+			transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+		}
+		.aircraft-pick:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 45, 85, 0.12); }
+		.aircraft-pick[aria-pressed="true"] { border-color: #1261bd; box-shadow: 0 10px 22px rgba(18, 97, 189, 0.22); background: #eef5fe; }
+		.aircraft-pick .aircraft-pick-name { font-weight: 800; color: #102d55; font-size: 0.95rem; }
+		.aircraft-pick .aircraft-pick-meta { font-size: 0.78rem; color: #48576b; }
+		.aircraft-grid { max-height: 360px; overflow-y: auto; padding-right: 0.25rem; }
+
+		.airport-combobox { position: relative; }
+		.airport-combobox-input { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.airport-combobox-input.has-selection { border-color: #1261bd; background: #eef5fe; }
+		.airport-combobox-list {
+			position: absolute;
+			z-index: 30;
+			top: calc(100% + 6px);
+			left: 0;
+			right: 0;
+			max-height: 260px;
+			overflow-y: auto;
+			border-radius: 0.75rem;
+			border: 1px solid rgba(15, 23, 42, 0.12);
+			background: #fff;
+			box-shadow: 0 16px 32px rgba(16, 45, 85, 0.18);
+			padding: 0.35rem;
+		}
+		.airport-option {
+			display: block;
+			width: 100%;
+			text-align: left;
+			border: none;
+			background: transparent;
+			border-radius: 0.5rem;
+			padding: 0.55rem 0.7rem;
+			font-size: 0.88rem;
+			color: #102d55;
+			cursor: pointer;
+		}
+		.airport-option strong { color: #1261bd; }
+		.airport-option:hover,
+		.airport-option.is-active { background: #eef5fe; }
+		.airport-combobox-empty { padding: 0.6rem 0.7rem; font-size: 0.85rem; color: #64748b; }
+
+		#sim-results { animation: sim-fade-in 380ms ease; }
+		@keyframes sim-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+		}
+	</style>
+</head>
+	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+	<header class="fixed inset-x-0 top-0 z-50 flex min-h-16 items-center bg-[#438ff0] shadow-[0_1px_0_rgba(0,0,0,0.18)]" aria-label="Navegação principal">
+		<a class="absolute left-[18px] top-1 flex h-14 w-[66px] items-center justify-center max-sm:left-1" href="./index.html" aria-label="Ir para a página principal"><img class="block h-14 w-[62px] object-contain" src="./images/AviatorLogo.png" alt="Aviator Info"></a>
+		<nav class="flex w-full items-center justify-center gap-0.5 px-1 pl-[78px] sm:gap-[clamp(24px,12vw,180px)] sm:px-[100px] sm:pl-[100px]">
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(11px,3.4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./modelos.html">Modelos</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(11px,3.4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./aeroportos.html">Aeroportos</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(11px,3.4vw,20px)] font-normal leading-none text-white no-underline transition hover:text-black focus-visible:text-black focus-visible:outline-none sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./companhias.html">Companhias</a>
+			<a class="border-2 border-transparent px-[3px] py-[9px] !text-[clamp(11px,3.4vw,20px)] font-normal leading-none text-black no-underline transition sm:px-[18px] sm:py-2.5 sm:!text-[20px]" href="./simulacao.html" aria-current="page">Simulação</a>
+		</nav>
+	</header>
+	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Simulação</h1>
+		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Escolha a aeronave, o aeroporto de origem e o de destino para estimar o tempo de voo com base nos parâmetros reais de cada modelo.</p>
+
+		<section class="mt-8 rounded-2xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(16,45,85,0.12)] sm:p-8" aria-labelledby="sim-title">
+			<h2 id="sim-title" class="sr-only">Simulador de voo</h2>
+
+			<div class="mb-8">
+				<p class="mb-3 text-sm font-bold uppercase tracking-[1.5px] text-[#1261bd]">Passo 1: Onde você está e para onde vai?</p>
+				<div class="grid gap-4 sm:grid-cols-2">
+					<div>
+						<label for="origin-country" class="mb-1 block text-sm font-semibold text-[#102d55]">País de origem</label>
+						<select id="origin-country" class="sim-select"></select>
+					</div>
+					<div>
+						<label for="dest-country" class="mb-1 block text-sm font-semibold text-[#102d55]">País de destino</label>
+						<select id="dest-country" class="sim-select"></select>
+					</div>
+					<div class="airport-combobox">
+						<label for="origin-airport-input" class="mb-1 block text-sm font-semibold text-[#102d55]">Aeroporto de origem</label>
+						<input type="text" id="origin-airport-input" class="sim-select airport-combobox-input" placeholder="Carregando..." autocomplete="off" disabled aria-expanded="false" role="combobox" aria-autocomplete="list">
+						<div id="origin-airport-list" class="airport-combobox-list hidden" role="listbox"></div>
+					</div>
+					<div class="airport-combobox">
+						<label for="dest-airport-input" class="mb-1 block text-sm font-semibold text-[#102d55]">Aeroporto de destino</label>
+						<input type="text" id="dest-airport-input" class="sim-select airport-combobox-input" placeholder="Carregando..." autocomplete="off" disabled aria-expanded="false" role="combobox" aria-autocomplete="list">
+						<div id="dest-airport-list" class="airport-combobox-list hidden" role="listbox"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-8">
+				<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+					<p class="text-sm font-bold uppercase tracking-[1.5px] text-[#1261bd]">Passo 2: Escolha a aeronave</p>
+					<div class="flex items-center gap-2">
+						<label for="manufacturer-filter" class="text-xs font-semibold text-[#48576b]">Fabricante</label>
+						<select id="manufacturer-filter" class="sim-select !w-auto !py-1.5 !text-sm"></select>
+					</div>
+				</div>
+				<div id="aircraft-grid" class="aircraft-grid grid gap-3 sm:grid-cols-2 lg:grid-cols-3" role="radiogroup" aria-label="Escolha do modelo de aeronave"></div>
+			</div>
+
+			<p id="sim-error" class="mb-4 hidden text-sm font-semibold text-rose-700" role="alert"></p>
+
+			<button id="sim-button" type="button" class="w-full rounded-xl bg-[#1261bd] px-6 py-3.5 text-base font-bold text-white shadow-[0_10px_24px_rgba(18,97,189,0.28)] transition hover:bg-[#102d55] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50">
+				🚀 Simular tempo de voo
+			</button>
+
+			<div id="sim-results" class="mt-8 hidden border-t border-slate-200 pt-8">
+				<p class="mb-4 text-sm font-bold uppercase tracking-[1.5px] text-[#1261bd]">📊 Resultados da simulação</p>
+
+				<div class="flex flex-wrap items-center justify-center gap-4 text-center sm:justify-between">
+					<div>
+						<div class="text-2xl" id="result-origin-flag" aria-hidden="true"></div>
+						<div class="text-xl font-extrabold text-[#102d55]" id="result-origin-code"></div>
+						<div class="text-sm text-[#48576b]" id="result-origin-city"></div>
+					</div>
+					<div class="flex-1 border-t-2 border-dashed border-slate-300" aria-hidden="true"></div>
+					<div class="text-2xl" aria-hidden="true">✈️</div>
+					<div class="flex-1 border-t-2 border-dashed border-slate-300" aria-hidden="true"></div>
+					<div>
+						<div class="text-2xl" id="result-dest-flag" aria-hidden="true"></div>
+						<div class="text-xl font-extrabold text-[#102d55]" id="result-dest-code"></div>
+						<div class="text-sm text-[#48576b]" id="result-dest-city"></div>
+					</div>
+				</div>
+
+				<p class="mt-6 text-2xl font-extrabold text-[#102d55] sm:text-3xl">🕐 Tempo estimado: <span id="result-time"></span></p>
+
+				<ul class="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-[#18283b]">
+					<li>Distância calculada: <strong id="result-distance"></strong></li>
+					<li>Aeronave selecionada: <strong id="result-aircraft"></strong></li>
+					<li>Tempo de cruzeiro: <strong id="result-cruise-time"></strong></li>
+					<li>Tempo de manobra (táxi/pouso/decolagem): <strong id="result-maneuver-time"></strong></li>
+				</ul>
+
+				<button id="sim-reset" type="button" class="mt-6 rounded-xl border border-slate-900/15 bg-white px-5 py-2.5 text-sm font-semibold text-[#102d55] shadow-sm transition hover:bg-slate-50">
+					Fazer nova simulação
+				</button>
+			</div>
+		</section>
+	</main>
+	<script src="./aircraft-data.js"></script>
+	<script src="./simulacao.js"></script>
+</body>
+</html>

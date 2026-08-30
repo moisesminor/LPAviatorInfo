@@ -159,13 +159,13 @@ async function getAirportsListByCountry(countryName) {
   const rows = await getAllAirportsRaw();
   const airports = rows
     .filter((cols) => cols.length >= 14 && cols[3] === countryName)
-    .filter((cols) => cols[4] && cols[5] && cols[4] !== '\\N' && cols[5] !== '\\N')
+    .filter((cols) => cols[5] && cols[5] !== '\\N')
     .map((cols) => ({
       id: Number(cols[0]) || null,
       name: cols[1] || 'Aeroporto',
       city: cols[2] || countryName,
       country: cols[3] || countryName,
-      iata: cols[4] || '',
+      iata: cols[4] && cols[4] !== '\\N' ? cols[4] : '',
       icao: cols[5] || '',
       latitude: Number(cols[6]) || null,
       longitude: Number(cols[7]) || null,
@@ -347,6 +347,24 @@ app.get('/api/airports/usa', async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       error: 'Erro ao carregar os aeroportos dos Estados Unidos.',
+      details: error.message
+    });
+  }
+});
+
+app.get('/api/airports-list/:slug', async (req, res) => {
+  const countryName = COUNTRY_BY_SLUG[req.params.slug];
+
+  if (!countryName) {
+    return res.status(404).json({ error: 'País não suportado.' });
+  }
+
+  try {
+    const airports = await getAirportsListByCountry(countryName);
+    return res.json({ country: req.params.slug, total: airports.length, airports });
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Erro ao carregar a lista de aeroportos.',
       details: error.message
     });
   }
