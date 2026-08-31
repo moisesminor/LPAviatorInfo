@@ -385,11 +385,16 @@
 	async function loadFeaturedFlights() {
 		try {
 			const response = await fetch('/api/flights/featured');
-			if (!response.ok) return;
+			if (!response.ok) {
+				const body = await response.json().catch(() => null);
+				console.warn('[rastreio] /api/flights/featured falhou:', response.status, body?.error || '(sem detalhes)');
+				return;
+			}
 			const data = await response.json();
 			renderFeaturedFlights(data.flights);
 		} catch (error) {
 			// Sem voos em destaque disponíveis; a busca manual continua funcionando.
+			console.warn('[rastreio] /api/flights/featured: erro de rede ou servidor fora do ar:', error.message);
 		}
 	}
 
