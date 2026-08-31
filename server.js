@@ -5,6 +5,10 @@ require('dotenv').config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const airportDetailsCache = new Map();
+const flightSearchCache = new Map();
+const FLIGHT_SEARCH_CACHE_TTL_MS = 1000 * 60 * 5;
+const featuredFlightsCache = new Map();
+const FEATURED_FLIGHTS_CACHE_TTL_MS = 1000 * 60 * 3;
 const allAirportsRawCache = { data: null, loadedAt: 0 };
 const airportsByCountryCache = new Map();
 const resolvedAirportsByCountryCache = new Map();
@@ -178,6 +182,35 @@ async function getAirportsListByCountry(countryName) {
   return airports;
 }
 
+const airportCoordsCache = new Map();
+
+async function findAirportCoordsByCode(code) {
+  const normalizedCode = String(code || '').trim().toUpperCase();
+  if (!normalizedCode) return null;
+
+  if (airportCoordsCache.has(normalizedCode)) {
+    return airportCoordsCache.get(normalizedCode);
+  }
+
+  const rows = await getAllAirportsRaw();
+  const match = rows.find((cols) => cols.length >= 8 && (cols[4] === normalizedCode || cols[5] === normalizedCode));
+
+  const result = match
+    ? {
+        name: match[1] || null,
+        city: match[2] || null,
+        iata: match[4] && match[4] !== '\\N' ? match[4] : null,
+        icao: match[5] || null,
+        lat: Number(match[6]),
+        lon: Number(match[7])
+      }
+    : null;
+
+  const coords = result && !Number.isNaN(result.lat) && !Number.isNaN(result.lon) ? result : null;
+  airportCoordsCache.set(normalizedCode, coords);
+  return coords;
+}
+
 async function fetchAirportDetailsByIcao(icao) {
   const normalizedIcao = String(icao).trim().toUpperCase();
   if (!normalizedIcao) return null;
@@ -212,6 +245,7 @@ function normalizeFlightData(flight = {}) {
   const arrival = flight.arrival || {};
   const airline = flight.airline || {};
   const live = flight.live || {};
+  const aircraft = flight.aircraft || {};
 
   return {
     flight_date: flight.flight_date || null,
@@ -221,6 +255,12 @@ function normalizeFlightData(flight = {}) {
     airline: airline.name || null,
     airline_iata: airline.iata || null,
     airline_icao: airline.icao || null,
+    aircraft: {
+      registration: aircraft.registration || null,
+      iata: aircraft.iata || null,
+      icao: aircraft.icao || null,
+      icao24: aircraft.icao24 || null
+    },
     departure: {
       airport: departure.airport || departure.airport_name || null,
       iata: departure.iata || departure.airport_iata || null,
@@ -288,28 +328,40 @@ app.get('/api/airport/:icao', async (req, res) => {
   const { icao } = req.params;
   const apiToken = process.env.AIRPORTDB_API_TOKEN;
 
-  if (!apiToken) {
-    return res.status(500).json({
-      error: 'AIRPORTDB_API_TOKEN não configurado. Adicione o token em .env'
-    });
+  if (apiToken) {
+    try {
+      const response = await fetch(`https://airportdb.io/api/v1/airport/${icao.toUpperCase()}?apiToken=${apiToken}`);
+
+      if (response.ok) {
+        return res.json(await response.json());
+      }
+    } catch (error) {
+      // AirportDB indisponível: cai para o fallback OpenFlights abaixo.
+    }
   }
 
   try {
-    const response = await fetch(`https://airportdb.io/api/v1/airport/${icao.toUpperCase()}?apiToken=${apiToken}`);
+    const coords = await findAirportCoordsByCode(icao);
 
-    if (!response.ok) {
-      const text = await response.text();
-      return res.status(response.status).json({
-        error: 'Erro ao consultar a API do AirportDB',
-        details: text
-      });
+    if (!coords) {
+      return res.status(404).json({ error: 'Aeroporto não encontrado.' });
     }
 
-    const data = await response.json();
-    return res.json(data);
+    return res.json({
+      ident: coords.icao || String(icao).toUpperCase(),
+      icao_code: coords.icao || String(icao).toUpperCase(),
+      iata_code: coords.iata || null,
+      name: coords.name,
+      municipality: coords.city,
+      latitude_deg: coords.lat,
+      longitude_deg: coords.lon,
+      elevation_ft: null,
+      runways: [],
+      source: 'openflights'
+    });
   } catch (error) {
     return res.status(500).json({
-      error: 'Falha ao acessar a API do AirportDB',
+      error: 'Falha ao buscar dados do aeroporto.',
       details: error.message
     });
   }
@@ -372,6 +424,23 @@ async function buildAirportsResponse(countryName, req) {
 
   return { total, offset, limit, airports: page };
 }
+
+app.get('/api/airport-coords/:code', async (req, res) => {
+  try {
+    const coords = await findAirportCoordsByCode(req.params.code);
+
+    if (!coords) {
+      return res.status(404).json({ error: 'Aeroporto não encontrado.' });
+    }
+
+    return res.json(coords);
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Erro ao buscar coordenadas do aeroporto.',
+      details: error.message
+    });
+  }
+});
 
 app.get('/api/airports/brasil', async (req, res) => {
   try {
@@ -441,6 +510,12 @@ app.get('/api/flights/search', async (req, res) => {
   if (arrIata) query.arr_iata = arrIata.toUpperCase();
   if (status) query.flight_status = status;
 
+  const cacheKey = JSON.stringify(query);
+  const cached = flightSearchCache.get(cacheKey);
+  if (cached && Date.now() - cached.loadedAt < FLIGHT_SEARCH_CACHE_TTL_MS) {
+    return res.json(cached.data);
+  }
+
   try {
     const url = `https://api.aviationstack.com/v1/flights?${new URLSearchParams(query).toString()}`;
     const response = await fetch(url);
@@ -455,11 +530,72 @@ app.get('/api/flights/search', async (req, res) => {
 
     const data = await response.json();
     const results = Array.isArray(data?.data) ? data.data.map(normalizeFlightData) : [];
+    const payload = { pagination: data?.pagination || null, results };
 
-    return res.json({
-      pagination: data?.pagination || null,
-      results
+    flightSearchCache.set(cacheKey, { data: payload, loadedAt: Date.now() });
+    return res.json(payload);
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Falha ao acessar a API do AviationStack.',
+      details: error.message
     });
+  }
+});
+
+app.get('/api/flights/featured', async (req, res) => {
+  const apiKey = process.env.AVIATIONSTACK_API_KEY;
+
+  if (!apiKey) {
+    return res.status(400).json({
+      error: 'AVIATIONSTACK_API_KEY não configurado. Adicione a chave no arquivo .env.'
+    });
+  }
+
+  const depIata = String(req.query.dep_iata || 'GRU').trim().toUpperCase();
+  const cached = featuredFlightsCache.get(depIata);
+
+  if (cached && Date.now() - cached.loadedAt < FEATURED_FLIGHTS_CACHE_TTL_MS) {
+    return res.json({ dep_iata: depIata, flights: cached.data });
+  }
+
+  try {
+    const query = { access_key: apiKey, dep_iata: depIata, flight_status: 'active', limit: 30 };
+    const url = `https://api.aviationstack.com/v1/flights?${new URLSearchParams(query).toString()}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const text = await response.text();
+      return res.status(response.status).json({
+        error: 'Erro ao consultar a API do AviationStack.',
+        details: text
+      });
+    }
+
+    const data = await response.json();
+    const flights = (Array.isArray(data?.data) ? data.data : [])
+      .filter((flight) => flight.flight?.iata && flight.airline?.name && flight.airline.name !== 'empty' && flight.arrival?.iata)
+      .map((flight) => {
+        const live = flight.live || {};
+        return {
+          flight_iata: flight.flight.iata,
+          airline: flight.airline.name,
+          dep_iata: flight.departure?.iata || depIata,
+          arr_iata: flight.arrival.iata,
+          status: flight.flight_status || 'unknown',
+          live: {
+            is_live: Boolean(live && live.latitude != null && live.longitude != null),
+            altitude_ft: live.altitude ?? null,
+            speed_kmh: live.speed_horizontal ?? null,
+            direction: live.direction ?? null
+          }
+        };
+      })
+      // Prioriza voos com telemetria ao vivo real (altitude/velocidade/direção) antes dos demais ativos.
+      .sort((a, b) => Number(b.live.is_live) - Number(a.live.is_live))
+      .slice(0, 6);
+
+    featuredFlightsCache.set(depIata, { data: flights, loadedAt: Date.now() });
+    return res.json({ dep_iata: depIata, flights });
   } catch (error) {
     return res.status(500).json({
       error: 'Falha ao acessar a API do AviationStack.',
