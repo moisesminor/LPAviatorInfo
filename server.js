@@ -207,6 +207,49 @@ async function fetchAirportDetailsByIcao(icao) {
   }
 }
 
+function normalizeFlightData(flight = {}) {
+  const departure = flight.departure || {};
+  const arrival = flight.arrival || {};
+  const airline = flight.airline || {};
+  const live = flight.live || {};
+
+  return {
+    flight_date: flight.flight_date || null,
+    flight_number: flight.flight?.number || null,
+    flight_iata: flight.flight?.iata || null,
+    flight_icao: flight.flight?.icao || null,
+    airline: airline.name || null,
+    airline_iata: airline.iata || null,
+    airline_icao: airline.icao || null,
+    departure: {
+      airport: departure.airport || departure.airport_name || null,
+      iata: departure.iata || departure.airport_iata || null,
+      icao: departure.icao || null,
+      scheduled: departure.scheduled || departure.estimated || null,
+      actual: departure.actual || departure.estimated || null,
+      timezone: departure.timezone || null
+    },
+    arrival: {
+      airport: arrival.airport || arrival.airport_name || null,
+      iata: arrival.iata || arrival.airport_iata || null,
+      icao: arrival.icao || null,
+      scheduled: arrival.scheduled || arrival.estimated || null,
+      actual: arrival.actual || arrival.estimated || null,
+      timezone: arrival.timezone || null
+    },
+    status: flight.flight_status || 'unknown',
+    live: {
+      is_live: Boolean(live && Object.keys(live).length),
+      latitude: live.latitude ?? null,
+      longitude: live.longitude ?? null,
+      altitude_ft: live.altitude ?? null,
+      speed_kmh: live.speed_horizontal ?? null,
+      direction: live.direction ?? null,
+      updated_at: live.updated || null
+    }
+  };
+}
+
 async function mapWithConcurrency(items, concurrency, mapper) {
   const results = new Array(items.length);
   let nextIndex = 0;
@@ -365,6 +408,61 @@ app.get('/api/airports-list/:slug', async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       error: 'Erro ao carregar a lista de aeroportos.',
+      details: error.message
+    });
+  }
+});
+
+app.get('/api/flights/search', async (req, res) => {
+  const apiKey = process.env.AVIATIONSTACK_API_KEY;
+
+  if (!apiKey) {
+    return res.status(400).json({
+      error: 'AVIATIONSTACK_API_KEY não configurado. Adicione a chave no arquivo .env.'
+    });
+  }
+
+  const query = {
+    access_key: apiKey,
+    limit: Math.min(Math.max(Number(req.query.limit) || 10, 1), 20)
+  };
+
+  const flightIata = String(req.query.flight_iata || '').trim();
+  const flightIcao = String(req.query.flight_icao || '').trim();
+  const airlineIata = String(req.query.airline_iata || '').trim();
+  const depIata = String(req.query.dep_iata || '').trim();
+  const arrIata = String(req.query.arr_iata || '').trim();
+  const status = String(req.query.status || '').trim();
+
+  if (flightIata) query.flight_iata = flightIata.toUpperCase();
+  if (flightIcao) query.flight_icao = flightIcao.toUpperCase();
+  if (airlineIata) query.airline_iata = airlineIata.toUpperCase();
+  if (depIata) query.dep_iata = depIata.toUpperCase();
+  if (arrIata) query.arr_iata = arrIata.toUpperCase();
+  if (status) query.flight_status = status;
+
+  try {
+    const url = `https://api.aviationstack.com/v1/flights?${new URLSearchParams(query).toString()}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const text = await response.text();
+      return res.status(response.status).json({
+        error: 'Erro ao consultar a API do AviationStack.',
+        details: text
+      });
+    }
+
+    const data = await response.json();
+    const results = Array.isArray(data?.data) ? data.data.map(normalizeFlightData) : [];
+
+    return res.json({
+      pagination: data?.pagination || null,
+      results
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Falha ao acessar a API do AviationStack.',
       details: error.message
     });
   }
