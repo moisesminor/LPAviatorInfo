@@ -1,0 +1,42 @@
+// Copia os builds UMD de gsap/lenis de node_modules para vendor/ (commitado).
+// Rodar depois de atualizar as versões em package.json: npm run vendor:sync
+//
+// Fica em scripts/ de propósito: essa pasta NÃO está no glob `content` do
+// tailwind.config.js (`./*.html`, `./*.js` — só raiz), então nunca é
+// escaneada pelo Tailwind. Se algum dia mover isso para a raiz, vendor/
+// também precisaria virar exclusão explícita no tailwind.config.js.
+const fs = require('fs');
+const path = require('path');
+
+const root = path.join(__dirname, '..');
+const out = path.join(root, 'vendor');
+
+const files = [
+	['gsap/dist/gsap.min.js', 'gsap.min.js'],
+	['gsap/dist/ScrollTrigger.min.js', 'ScrollTrigger.min.js'],
+	['lenis/dist/lenis.min.js', 'lenis.min.js'],
+	['lenis/LICENSE', 'lenis-LICENSE'],
+	['leaflet/dist/leaflet.js', 'leaflet/leaflet.js'],
+	['leaflet/dist/leaflet.css', 'leaflet/leaflet.css'],
+	['leaflet/dist/images/marker-icon.png', 'leaflet/images/marker-icon.png'],
+	['leaflet/dist/images/marker-icon-2x.png', 'leaflet/images/marker-icon-2x.png'],
+	['leaflet/dist/images/marker-shadow.png', 'leaflet/images/marker-shadow.png'],
+	['leaflet/dist/images/layers.png', 'leaflet/images/layers.png'],
+	['leaflet/dist/images/layers-2x.png', 'leaflet/images/layers-2x.png'],
+	['leaflet/LICENSE', 'leaflet-LICENSE'],
+];
+
+fs.mkdirSync(out, { recursive: true });
+fs.mkdirSync(path.join(out, 'leaflet'), { recursive: true });
+fs.mkdirSync(path.join(out, 'leaflet', 'images'), { recursive: true });
+
+for (const [from, to] of files) {
+	const src = path.join(root, 'node_modules', from);
+	const dest = path.join(out, to);
+	fs.copyFileSync(src, dest);
+	console.log(`vendor <- ${from}`);
+}
+
+console.log('\nvendor/gsap-LICENSE.md não é copiado automaticamente: o pacote gsap');
+console.log('não publica um arquivo de licença próprio (o aviso vive no cabeçalho');
+console.log('dos .js). Revise vendor/gsap-LICENSE.md manualmente se a versão mudar.');

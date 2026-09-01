@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes hero-glow {
+  0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+.hero-glow {
+  animation: hero-glow 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow {
+    animation: none;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* will-change no vídeo e no conteúdo do hero só enquanto o ScrollTrigger
+   está ativo (ver onToggle -> #hero.is-live no hero.js) */
+#hero.is-live #hero-video,
+#hero.is-live #hero-copy {
+  will-change: transform, opacity;
+}

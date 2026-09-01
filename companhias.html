@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<title>Companhias | Aviator Info</title>
+	<link rel="stylesheet" href="./dist/tailwind.css">
+</head>
+	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+	<header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
+		<div class="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
+			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./index.html" aria-label="Ir para a página principal"><img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="./images/AviatorLogo.png" alt="Aviator Info"></a>
+			<nav class="no-scrollbar flex items-center gap-0.5 overflow-x-auto sm:gap-2">
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./modelos.html">Modelos</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./aeroportos.html">Aeroportos</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-2 text-[13px] font-semibold text-[#1a56c4] shadow-sm sm:px-5 sm:text-base" href="./companhias.html" aria-current="page">Companhias</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./simulacao.html">Simulação</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
+			</nav>
+		</div>
+	</header>
+	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Companhias</h1>
+		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Veja informações sobre companhias aéreas, suas operações e os destinos atendidos.</p>
+		<section class="mt-[34px] grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]" aria-label="Companhias em destaque">
+			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">LATAM Airlines</h2><p class="text-lg leading-[1.6] text-[#18283b]">Conexões nacionais e internacionais a partir da América do Sul.</p></article>
+			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">Azul</h2><p class="text-lg leading-[1.6] text-[#18283b]">Uma ampla malha aérea conectando cidades brasileiras.</p></article>
+			<article class="rounded-lg border border-slate-900/15 bg-white/[0.86] p-6 shadow-[0_8px_20px_rgba(2,6,23,0.12)]"><h2 class="mb-2 text-xl font-bold text-[#102d55]">GOL Linhas Aéreas</h2><p class="text-lg leading-[1.6] text-[#18283b]">Voos e serviços para diferentes regiões do Brasil e do exterior.</p></article>
+		</section>
+	</main>
+</body>
+</html>

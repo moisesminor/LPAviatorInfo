@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<title>Modelos | Aviator Info</title>
+	<link rel="stylesheet" href="./dist/tailwind.css">
+	<style>
+		h3.group {
+			position: relative;
+			display: block;
+			width: 100%;
+			overflow: hidden;
+			padding: 1rem 1.35rem;
+			margin: 2.5rem 0 0;
+			border-radius: 12px 12px 0 0;
+			background: #438ff0;
+			color: #000;
+			font-size: clamp(2.2rem, 3vw, 2.9rem);
+			font-weight: 900;
+			letter-spacing: -0.05em;
+			line-height: 1.1;
+			box-shadow: 0 8px 18px rgba(27, 78, 160, 0.18);
+			transition: transform 300ms ease, box-shadow 300ms ease;
+		}
+		h3.group .mfr-toggle {
+			position: relative;
+			z-index: 3;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.6rem;
+			width: 100%;
+			background: none;
+			border: none;
+			padding: 0;
+			margin: 0;
+			cursor: pointer;
+			font: inherit;
+			color: inherit;
+			letter-spacing: inherit;
+			text-align: left;
+		}
+		h3.group .mfr-name {
+			display: inline-block;
+		}
+		h3.group .mfr-chevron {
+			display: inline-block;
+			font-size: 0.6em;
+			line-height: 1;
+			transition: transform 350ms ease;
+		}
+		h3.group.expanded .mfr-chevron {
+			transform: rotate(180deg);
+		}
+		h3.group .plane-icon {
+			position: absolute;
+			top: 50%;
+			left: 1.35rem;
+			width: 2.2rem;
+			height: auto;
+			transform: translateY(-50%) rotate(-8deg) scale(0.75);
+			opacity: 0;
+			z-index: 2;
+			pointer-events: none;
+			filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+			transition: left 1900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 600ms ease, transform 1900ms cubic-bezier(0.65, 0, 0.35, 1);
+		}
+		h3.group.expanded .plane-icon {
+			left: calc(100% - 3.4rem);
+			opacity: 1;
+			transform: translateY(-50%) rotate(4deg) scale(1);
+		}
+		h3.group::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(90deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.18) 28%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0) 100%);
+			opacity: 1;
+			transition: opacity 650ms ease;
+			pointer-events: none;
+		}
+		h3.group::after {
+			content: "";
+			position: absolute;
+			top: -18%;
+			right: -30%;
+			height: 140%;
+			width: 42%;
+			background: linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.26) 45%, rgba(255,255,255,0) 100%);
+			transform: translateX(140%) skewX(-18deg);
+			transition: transform 900ms ease;
+			pointer-events: none;
+		}
+		h3.group:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 22px rgba(27, 78, 160, 0.26);
+		}
+		h3.group:hover::before {
+			opacity: 0.4;
+		}
+		h3.group:hover::after {
+			transform: translateX(10%) skewX(-18deg);
+		}
+		#models-section .aircraft-grid {
+			margin-top: 0;
+			background: #edf3fb;
+			border-radius: 0 0 12px 12px;
+			box-shadow: 0 10px 20px rgba(2, 6, 23, 0.08);
+			overflow: hidden;
+			max-height: 0;
+			opacity: 0;
+			padding: 0 1rem;
+			transition: max-height 500ms ease, opacity 350ms ease, padding 350ms ease;
+		}
+		#models-section .aircraft-grid.expanded {
+			max-height: 4000px;
+			opacity: 1;
+			padding: 1rem;
+		}
+		#models-section article {
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			border-radius: 10px;
+			background: rgba(255,255,255,0.92);
+			box-shadow: 0 8px 20px rgba(2, 6, 23, 0.2);
+			transition: transform 200ms ease, box-shadow 200ms ease;
+		}
+		#models-section article:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 14px 28px rgba(2, 6, 23, 0.25);
+		}
+		#models-section article img {
+			display: block;
+			height: 11rem;
+			width: 100%;
+			object-fit: cover;
+			transition: transform 300ms ease;
+		}
+		#models-section article:hover img {
+			transform: scale(1.05);
+		}
+		#models-section article > span {
+			display: block;
+			padding: 1rem 1.25rem 0.5rem;
+			font-size: 1.125rem;
+			font-weight: 800;
+			line-height: 1.3;
+			color: #111827;
+		}
+		.aircraft-card {
+			display: flex;
+			flex-direction: column;
+		}
+		.aircraft-title {
+			display: block;
+			padding: 1rem 1.25rem 0.5rem;
+			font-size: 1.125rem;
+			font-weight: 800;
+			line-height: 1.3;
+			color: #111827;
+		}
+		.aircraft-specs {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.5rem;
+			padding: 0 1.25rem 0.35rem;
+			font-size: 0.72rem;
+			color: #1f2937;
+		}
+		.spec {
+			display: flex;
+			flex-direction: column;
+			gap: 0.15rem;
+			padding: 0.35rem 0.4rem;
+			border-radius: 0.5rem;
+			background: #f3f7fb;
+		}
+		.spec span {
+			display: block;
+			font-size: 0.58rem;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #516079;
+		}
+		.spec strong {
+			display: block;
+			font-size: 0.74rem;
+			font-weight: 800;
+			color: #101827;
+		}
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.75rem 1rem;
+			border: 1px solid transparent;
+			border-radius: 9999px;
+			font-size: 0.78rem;
+			font-weight: 800;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, border-color 200ms ease;
+		}
+		.btn-primary {
+			background: #438ff0;
+			color: #ffffff;
+			border-color: #3d87ea;
+			box-shadow: 0 8px 18px rgba(67, 143, 240, 0.2);
+		}
+		.btn-primary:hover {
+			background: #2f7ce4;
+			border-color: #2b72d1;
+			transform: translateY(-1px);
+		}
+		.btn-wide {
+			width: calc(100% - 2.5rem);
+			margin: 0 1.25rem 1rem;
+			margin-top: auto;
+		}
+		.aircraft-details {
+			max-height: 0;
+			overflow: hidden;
+			padding: 0 1.25rem;
+			transition: max-height 260ms ease, padding 260ms ease, opacity 260ms ease;
+			opacity: 0;
+		}
+		.aircraft-card.open .aircraft-details {
+			max-height: 220px;
+			padding: 0 1.25rem 1rem;
+			opacity: 1;
+		}
+		.aircraft-detail-list {
+			margin: 0;
+			padding-left: 1.1rem;
+			color: #1f2937;
+			font-size: 0.76rem;
+			line-height: 1.6;
+		}
+		.aircraft-card.open .more-details-btn {
+			background: #1d4ed8;
+		}
+	</style>
+</head>
+	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+	<header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
+		<div class="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
+			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./index.html" aria-label="Ir para a página principal"><img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="./images/AviatorLogo.png" alt="Aviator Info"></a>
+			<nav class="no-scrollbar flex items-center gap-0.5 overflow-x-auto sm:gap-2">
+				<a class="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-2 text-[13px] font-semibold text-[#1a56c4] shadow-sm sm:px-5 sm:text-base" href="./modelos.html" aria-current="page">Modelos</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./aeroportos.html">Aeroportos</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./companhias.html">Companhias</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./simulacao.html">Simulação</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
+			</nav>
+		</div>
+	</header>
+	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Modelos</h1>
+		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Explore informações sobre aeronaves comerciais, suas especificações e a história de cada modelo.</p>
+		<section aria-labelledby="aircraft-title" class="mt-[34px]" id="models-section">
+			<div class="mb-6">
+				<p class="mb-1 text-sm font-semibold uppercase tracking-[2px] text-[#102d55]/70">Explore a frota</p>
+				<h2 id="aircraft-title" class="text-3xl font-bold text-[#102d55] sm:text-4xl">Modelos em destaque</h2>
+			</div>
+
+			<div id="models-container"></div>
+		</section>
+	</main>
+	<script src="./aircraft-data.js"></script>
+	<script>
+		const modelsContainer = document.getElementById('models-container');
+		const models = Array.isArray(window.AIRCRAFT_MODELS) ? window.AIRCRAFT_MODELS : [];
+
+		const manufacturers = [];
+		models.forEach((model) => {
+			if (!manufacturers.includes(model.manufacturer)) manufacturers.push(model.manufacturer);
+		});
+
+		manufacturers.forEach((manufacturer) => {
+			const heading = document.createElement('h3');
+			heading.className = 'group';
+
+			const toggleBtn = document.createElement('button');
+			toggleBtn.type = 'button';
+			toggleBtn.className = 'mfr-toggle';
+			toggleBtn.setAttribute('aria-expanded', 'false');
+
+			const nameSpan = document.createElement('span');
+			nameSpan.className = 'mfr-name';
+			nameSpan.textContent = manufacturer;
+
+			const chevron = document.createElement('span');
+			chevron.className = 'mfr-chevron';
+			chevron.setAttribute('aria-hidden', 'true');
+			chevron.textContent = '▾';
+
+			toggleBtn.appendChild(nameSpan);
+			toggleBtn.appendChild(chevron);
+			heading.appendChild(toggleBtn);
+
+			const plane = document.createElement('img');
+			plane.className = 'plane-icon';
+			plane.src = './images/AviaoSVG.svg';
+			plane.alt = '';
+			plane.setAttribute('aria-hidden', 'true');
+			heading.appendChild(plane);
+
+			modelsContainer.appendChild(heading);
+
+			const grid = document.createElement('div');
+			grid.className = 'aircraft-grid mt-0 rounded-b-[12px] bg-[#edf3fb] grid items-start gap-5 md:grid-cols-3 mb-8';
+			modelsContainer.appendChild(grid);
+
+			toggleBtn.addEventListener('click', () => {
+				const isExpanded = heading.classList.toggle('expanded');
+				grid.classList.toggle('expanded', isExpanded);
+				toggleBtn.setAttribute('aria-expanded', String(isExpanded));
+			});
+
+			models.filter((model) => model.manufacturer === manufacturer).forEach((aircraft) => {
+				const card = document.createElement('article');
+				card.className = 'group aircraft-card overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]';
+
+				const img = document.createElement('img');
+				img.src = aircraft.image;
+				img.alt = aircraft.alt || aircraft.name;
+				img.loading = 'lazy';
+				img.className = 'h-44 w-full object-cover transition duration-300 group-hover:scale-105';
+				card.appendChild(img);
+
+				const title = document.createElement('span');
+				title.className = 'aircraft-title block px-5 pb-2 pt-4 text-center text-lg font-extrabold leading-tight text-slate-900';
+				title.textContent = aircraft.name;
+				card.appendChild(title);
+
+				const specBlock = document.createElement('div');
+				specBlock.className = 'px-5 pb-2';
+				specBlock.innerHTML = `
+					<div class="overflow-hidden rounded-lg border border-slate-300 bg-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+						<div class="grid grid-cols-2 border-b border-slate-300 bg-slate-200 text-[0.56rem] font-bold uppercase tracking-[0.08em] text-slate-700">
+							<span class="border-r border-slate-300 px-2 py-2 text-center">Tipo</span>
+							<span class="px-2 py-2 text-center">Passageiros</span>
+						</div>
+						<div class="grid grid-cols-2 border-b border-slate-300 bg-white text-[0.72rem] font-semibold text-slate-800">
+							<span class="border-r border-slate-300 px-2 py-2 text-center">${aircraft.tipo}</span>
+							<span class="px-2 py-2 text-center">${aircraft.passageiros}</span>
+						</div>
+						<div class="grid grid-cols-2 border-b border-slate-300 bg-slate-200 text-[0.56rem] font-bold uppercase tracking-[0.08em] text-slate-700">
+							<span class="border-r border-slate-300 px-2 py-2 text-center">Autonomia</span>
+							<span class="px-2 py-2 text-center">Velocidade</span>
+						</div>
+						<div class="grid grid-cols-2 bg-white text-[0.72rem] font-semibold text-slate-800">
+							<span class="border-r border-slate-300 px-2 py-2 text-center">${aircraft.autonomia}</span>
+							<span class="px-2 py-2 text-center">${aircraft.velocidade}</span>
+						</div>
+					</div>
+				`;
+				card.appendChild(specBlock);
+
+				const detailPanel = document.createElement('div');
+				detailPanel.className = 'max-h-0 overflow-hidden px-5 opacity-0 transition-all duration-300';
+				detailPanel.innerHTML = `
+					<div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+						<div class="bg-slate-100 px-3 py-2 text-[0.58rem] font-bold uppercase tracking-[0.08em] text-slate-600">Observações</div>
+						<ul class="m-0 list-disc space-y-1 px-5 py-3 text-[0.76rem] leading-5 text-slate-700">
+							${aircraft.descricao.map((item) => `<li>${item}</li>`).join('')}
+						</ul>
+					</div>
+				`;
+
+				const toggleButton = document.createElement('button');
+				toggleButton.type = 'button';
+				toggleButton.className = 'btn btn-primary btn-wide'; 
+				toggleButton.textContent = 'Mais Detalhes';
+				toggleButton.setAttribute('aria-expanded', 'false');
+				toggleButton.addEventListener('click', () => {
+					const isOpen = card.classList.toggle('open');
+					toggleButton.setAttribute('aria-expanded', String(isOpen));
+					detailPanel.style.maxHeight = isOpen ? '220px' : '0px';
+					detailPanel.style.opacity = isOpen ? '1' : '0';
+					detailPanel.style.padding = isOpen ? '0 1.25rem 1rem' : '0 1.25rem';
+					if (isOpen) {
+						toggleButton.style.background = '#1d4ed8';
+						toggleButton.style.borderColor = '#1e40af';
+					} else {
+						toggleButton.style.background = '#438ff0';
+						toggleButton.style.borderColor = '#3d87ea';
+					}
+				});
+
+				card.appendChild(toggleButton);
+				card.appendChild(detailPanel);
+				grid.appendChild(card);
+			});
+		});
+	</script>
+</body>
+</html>
