@@ -53,6 +53,55 @@
 		h3.group.expanded .mfr-chevron {
 			transform: rotate(180deg);
 		}
+		.manufacturer-group {
+			position: relative;
+		}
+		.manufacturer-group .mfr-nav {
+			position: absolute;
+			inset: 0;
+			z-index: 6;
+			pointer-events: none;
+			opacity: 0;
+			transition: opacity 200ms ease;
+		}
+		.manufacturer-group.expanded .mfr-nav {
+			opacity: 1;
+		}
+		.manufacturer-group .mfr-nav-btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+			line-height: 1;
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 3.1rem;
+			height: 3.1rem;
+			border: none;
+			border-radius: 0.9rem;
+			background: rgba(15, 23, 42, 0.92);
+			color: #ffffff;
+			font-size: 2.25rem;
+			cursor: pointer;
+			box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+			transition: opacity 200ms ease, transform 200ms ease, background 200ms ease;
+			pointer-events: auto;
+		}
+		.manufacturer-group .mfr-nav-btn.prev {
+			left: -1.05rem;
+		}
+		.manufacturer-group .mfr-nav-btn.next {
+			right: -1.05rem;
+		}
+		.manufacturer-group .mfr-nav-btn:disabled {
+			opacity: 0.45;
+			cursor: not-allowed;
+		}
+		.manufacturer-group .mfr-nav-btn:not(:disabled):hover {
+			background: rgba(15, 23, 42, 1);
+			transform: translateY(-50%) translateY(-1px);
+		}
 		h3.group .plane-icon {
 			position: absolute;
 			top: 50%;
@@ -281,6 +330,9 @@
 		});
 
 		manufacturers.forEach((manufacturer) => {
+			const group = document.createElement('div');
+			group.className = 'manufacturer-group';
+
 			const heading = document.createElement('h3');
 			heading.className = 'group';
 
@@ -298,9 +350,26 @@
 			chevron.setAttribute('aria-hidden', 'true');
 			chevron.textContent = '▾';
 
+			const nav = document.createElement('div');
+			nav.className = 'mfr-nav';
+			const prevBtn = document.createElement('button');
+			prevBtn.type = 'button';
+			prevBtn.className = 'mfr-nav-btn prev';
+			prevBtn.setAttribute('aria-label', 'Modelos anteriores');
+			prevBtn.textContent = '‹';
+			prevBtn.disabled = true;
+			const nextBtn = document.createElement('button');
+			nextBtn.type = 'button';
+			nextBtn.className = 'mfr-nav-btn next';
+			nextBtn.setAttribute('aria-label', 'Próximos modelos');
+			nextBtn.textContent = '›';
+			nextBtn.disabled = true;
+			nav.append(prevBtn, nextBtn);
+
 			toggleBtn.appendChild(nameSpan);
 			toggleBtn.appendChild(chevron);
 			heading.appendChild(toggleBtn);
+			heading.appendChild(nav);
 
 			const plane = document.createElement('img');
 			plane.className = 'plane-icon';
@@ -309,21 +378,61 @@
 			plane.setAttribute('aria-hidden', 'true');
 			heading.appendChild(plane);
 
-			modelsContainer.appendChild(heading);
-
 			const grid = document.createElement('div');
 			grid.className = 'aircraft-grid mt-0 rounded-b-[12px] bg-[#edf3fb] grid items-start gap-5 md:grid-cols-3 mb-8';
-			modelsContainer.appendChild(grid);
+			const track = document.createElement('div');
+			track.className = 'flex gap-5 overflow-x-hidden scroll-smooth snap-x snap-mandatory md:gap-6';
+			track.style.gridColumn = '1 / -1';
+			grid.appendChild(track);
+
+			group.appendChild(heading);
+			group.appendChild(grid);
+			group.appendChild(nav);
+			modelsContainer.appendChild(group);
 
 			toggleBtn.addEventListener('click', () => {
 				const isExpanded = heading.classList.toggle('expanded');
+				group.classList.toggle('expanded', isExpanded);
 				grid.classList.toggle('expanded', isExpanded);
 				toggleBtn.setAttribute('aria-expanded', String(isExpanded));
+				prevBtn.disabled = !isExpanded || track.scrollLeft <= 2;
+				nextBtn.disabled = !isExpanded || track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
 			});
+
+			const getCardScrollAmount = () => {
+				const firstCard = track.querySelector('article');
+				if (!firstCard) return 0;
+				const gap = Number.parseFloat(getComputedStyle(track).gap || '0');
+				return firstCard.getBoundingClientRect().width + gap;
+			};
+
+			const updateArrowState = () => {
+				if (!heading.classList.contains('expanded')) {
+					prevBtn.disabled = true;
+					nextBtn.disabled = true;
+					return;
+				}
+				prevBtn.disabled = track.scrollLeft <= 2;
+				nextBtn.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+			};
+
+			prevBtn.addEventListener('click', () => {
+				track.scrollBy({ left: -getCardScrollAmount(), behavior: 'smooth' });
+			});
+
+			nextBtn.addEventListener('click', () => {
+				track.scrollBy({ left: getCardScrollAmount(), behavior: 'smooth' });
+			});
+
+			track.addEventListener('scroll', updateArrowState);
 
 			models.filter((model) => model.manufacturer === manufacturer).forEach((aircraft) => {
 				const card = document.createElement('article');
 				card.className = 'group aircraft-card overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]';
+				card.style.minWidth = 'calc((100% - 2.5rem) / 3)';
+				card.style.maxWidth = 'calc((100% - 2.5rem) / 3)';
+				card.style.flex = '0 0 calc((100% - 2.5rem) / 3)';
+				card.style.scrollSnapAlign = 'start';
 
 				const img = document.createElement('img');
 				img.src = aircraft.image;
@@ -362,11 +471,11 @@
 				card.appendChild(specBlock);
 
 				const detailPanel = document.createElement('div');
-				detailPanel.className = 'max-h-0 overflow-hidden px-5 opacity-0 transition-all duration-300';
+				detailPanel.className = 'aircraft-details';
 				detailPanel.innerHTML = `
 					<div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
 						<div class="bg-slate-100 px-3 py-2 text-[0.58rem] font-bold uppercase tracking-[0.08em] text-slate-600">Observações</div>
-						<ul class="m-0 list-disc space-y-1 px-5 py-3 text-[0.76rem] leading-5 text-slate-700">
+						<ul class="aircraft-detail-list">
 							${aircraft.descricao.map((item) => `<li>${item}</li>`).join('')}
 						</ul>
 					</div>
@@ -374,7 +483,7 @@
 
 				const toggleButton = document.createElement('button');
 				toggleButton.type = 'button';
-				toggleButton.className = 'btn btn-primary btn-wide'; 
+				toggleButton.className = 'btn btn-primary btn-wide more-details-btn';
 				toggleButton.textContent = 'Mais Detalhes';
 				toggleButton.setAttribute('aria-expanded', 'false');
 				toggleButton.addEventListener('click', () => {
@@ -394,7 +503,7 @@
 
 				card.appendChild(toggleButton);
 				card.appendChild(detailPanel);
-				grid.appendChild(card);
+				track.appendChild(card);
 			});
 		});
 	</script>
