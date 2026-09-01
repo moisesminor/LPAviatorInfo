@@ -61,3 +61,21 @@ window.AIRCRAFT_MODELS = [
 	{ manufacturer: 'Saab', name: 'Saab 340', image: 'https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80', alt: 'Saab 340', tipo: 'Turboélice', passageiros: '34', autonomia: '1.200 km', velocidade: 'Mach 0.5', velocidadeKmh: 530, descricao: ['Produção iniciada em 1990.', 'Tem boa aceitação em redes regionais por seu conforto e operação eficiente.', 'Sua proposta é bem alinhada com voos curtos e de boa ocupação.'] },
 	{ manufacturer: 'Saab', name: 'Saab 2000', image: 'https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1200&q=80', alt: 'Saab 2000', tipo: 'Turboélice', passageiros: '50', autonomia: '2.000 km', velocidade: 'Mach 0.6', velocidadeKmh: 640, descricao: ['Produção iniciada em 1994.', 'Foi desenvolvido para atender rotas regionais com conforto e boa performance.', 'Seu design reforça a eficiência em operações de conexão regional.'] }
 ];
+
+/*
+ * Nacionalidade dos fabricantes, conforme pesquisa pública (sede histórica/atual).
+ * countryCode segue ISO 3166-1 alpha-2, usado para os ícones de bandeira na página Modelos.
+ */
+window.MANUFACTURER_INFO = {
+	'Airbus': { country: 'França', countryCode: 'fr', hq: 'Toulouse' },
+	'Boeing': { country: 'Estados Unidos', countryCode: 'us', hq: 'Arlington, Virginia' },
+	'Embraer': { country: 'Brasil', countryCode: 'br', hq: 'São José dos Campos, SP' },
+	'McDonnell Douglas': { country: 'Estados Unidos', countryCode: 'us', hq: 'St. Louis, Missouri' },
+	'ATR': { country: 'França', countryCode: 'fr', hq: 'Blagnac (Toulouse) — joint-venture franco-italiana' },
+	'Bombardier': { country: 'Canadá', countryCode: 'ca', hq: 'Montreal, Quebec' },
+	'Cessna': { country: 'Estados Unidos', countryCode: 'us', hq: 'Wichita, Kansas' },
+	'Fokker': { country: 'Países Baixos', countryCode: 'nl', hq: 'Amsterdã' },
+	'Ilyushin': { country: 'Rússia', countryCode: 'ru', hq: 'Moscou' },
+	'Lockheed': { country: 'Estados Unidos', countryCode: 'us', hq: 'Burbank, Califórnia' },
+	'Saab': { country: 'Suécia', countryCode: 'se', hq: 'Linköping' }
+};
