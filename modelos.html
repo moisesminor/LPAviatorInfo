@@ -14,7 +14,7 @@
 			overflow: hidden;
 			padding: 1rem 1.35rem;
 			margin: 2.5rem 0 0;
-			border-radius: 12px 12px 0 0;
+			border-radius: 12px;
 			background: #438ff0;
 			color: #000;
 			font-size: clamp(2.2rem, 3vw, 2.9rem);
@@ -22,7 +22,10 @@
 			letter-spacing: -0.05em;
 			line-height: 1.1;
 			box-shadow: 0 8px 18px rgba(27, 78, 160, 0.18);
-			transition: transform 300ms ease, box-shadow 300ms ease;
+			transition: transform 300ms ease, box-shadow 300ms ease, border-radius 300ms ease;
+		}
+		h3.group.expanded {
+			border-radius: 12px 12px 0 0;
 		}
 		h3.group .mfr-toggle {
 			position: relative;
@@ -72,35 +75,41 @@
 			align-items: center;
 			justify-content: center;
 			padding: 0;
-			line-height: 1;
 			position: absolute;
 			top: 50%;
 			transform: translateY(-50%);
-			width: 3.1rem;
-			height: 3.1rem;
-			border: none;
-			border-radius: 0.9rem;
-			background: rgba(15, 23, 42, 0.92);
+			width: 2.75rem;
+			height: 2.75rem;
+			border: 2px solid rgba(255, 255, 255, 0.85);
+			border-radius: 9999px;
+			background: rgba(15, 23, 42, 0.88);
 			color: #ffffff;
-			font-size: 2.25rem;
 			cursor: pointer;
-			box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
-			transition: opacity 200ms ease, transform 200ms ease, background 200ms ease;
+			box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+			transition: opacity 200ms ease, transform 200ms ease, background 200ms ease, box-shadow 200ms ease;
 			pointer-events: auto;
 		}
+		.manufacturer-group .mfr-nav-btn svg {
+			width: 1.15rem;
+			height: 1.15rem;
+			display: block;
+			flex-shrink: 0;
+		}
 		.manufacturer-group .mfr-nav-btn.prev {
-			left: -1.05rem;
+			left: -1.1rem;
 		}
 		.manufacturer-group .mfr-nav-btn.next {
-			right: -1.05rem;
+			right: -1.1rem;
 		}
 		.manufacturer-group .mfr-nav-btn:disabled {
-			opacity: 0.45;
+			opacity: 0.4;
 			cursor: not-allowed;
 		}
 		.manufacturer-group .mfr-nav-btn:not(:disabled):hover {
-			background: rgba(15, 23, 42, 1);
-			transform: translateY(-50%) translateY(-1px);
+			background: #2f7ce4;
+			border-color: #ffffff;
+			transform: translateY(-50%) scale(1.08);
+			box-shadow: 0 10px 22px rgba(15, 23, 42, 0.32);
 		}
 		h3.group .plane-icon {
 			position: absolute;
@@ -166,6 +175,24 @@
 			max-height: 4000px;
 			opacity: 1;
 			padding: 1rem;
+		}
+		.aircraft-track {
+			scrollbar-width: thin;
+			scrollbar-color: #438ff0 #d7e4f7;
+		}
+		.aircraft-track::-webkit-scrollbar {
+			height: 9px;
+		}
+		.aircraft-track::-webkit-scrollbar-track {
+			background: #d7e4f7;
+			border-radius: 9999px;
+		}
+		.aircraft-track::-webkit-scrollbar-thumb {
+			background: #438ff0;
+			border-radius: 9999px;
+		}
+		.aircraft-track::-webkit-scrollbar-thumb:hover {
+			background: #2f7ce4;
 		}
 		#models-section article {
 			display: flex;
@@ -292,6 +319,51 @@
 		.aircraft-card.open .more-details-btn {
 			background: #1d4ed8;
 		}
+		.country-filter-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			border-radius: 9999px;
+			border: 1px solid #c7d9f3;
+			background: #ffffff;
+			padding: 0.55rem 1rem;
+			font-size: 0.82rem;
+			font-weight: 700;
+			color: #102d55;
+			cursor: pointer;
+			transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+		}
+		.country-filter-btn:hover {
+			border-color: #438ff0;
+			background: #eef4ff;
+		}
+		.country-filter-btn img {
+			display: block;
+			width: 1.35rem;
+			height: 1rem;
+			object-fit: cover;
+			border-radius: 2px;
+			box-shadow: 0 0 0 1px rgba(2, 6, 23, 0.08);
+		}
+		.country-filter-btn.active {
+			border-color: transparent;
+			background: #438ff0;
+			color: #ffffff;
+			box-shadow: 0 6px 14px rgba(67, 143, 240, 0.35);
+			transform: translateY(-1px);
+		}
+		.manufacturer-group.filtered-out {
+			display: none;
+		}
+		h3.group .mfr-flag {
+			display: inline-block;
+			width: 1.5rem;
+			height: 1.1rem;
+			object-fit: cover;
+			border-radius: 2px;
+			box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+			flex-shrink: 0;
+		}
 	</style>
 </head>
 	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
@@ -316,6 +388,8 @@
 				<h2 id="aircraft-title" class="text-3xl font-bold text-[#102d55] sm:text-4xl">Modelos em destaque</h2>
 			</div>
 
+			<div id="country-filter" class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar fabricantes por país"></div>
+
 			<div id="models-container"></div>
 		</section>
 	</main>
@@ -329,9 +403,50 @@
 			if (!manufacturers.includes(model.manufacturer)) manufacturers.push(model.manufacturer);
 		});
 
+		const MANUFACTURER_INFO = window.MANUFACTURER_INFO || {};
+		const countryFilterContainer = document.getElementById('country-filter');
+
+		function setActiveCountry(country) {
+			document.querySelectorAll('.manufacturer-group').forEach((group) => {
+				const matches = !country || group.dataset.country === country;
+				group.classList.toggle('filtered-out', !matches);
+			});
+			countryFilterContainer.querySelectorAll('.country-filter-btn').forEach((btn) => {
+				btn.classList.toggle('active', btn.dataset.country === (country || 'todos'));
+			});
+		}
+
+		const allCountriesBtn = document.createElement('button');
+		allCountriesBtn.type = 'button';
+		allCountriesBtn.className = 'country-filter-btn active';
+		allCountriesBtn.dataset.country = 'todos';
+		allCountriesBtn.innerHTML = '<span aria-hidden="true">🌐</span><span>Todos</span>';
+		allCountriesBtn.addEventListener('click', () => setActiveCountry(null));
+		countryFilterContainer.appendChild(allCountriesBtn);
+
+		const countries = [];
+		manufacturers.forEach((manufacturer) => {
+			const info = MANUFACTURER_INFO[manufacturer];
+			if (info && !countries.includes(info.country)) countries.push(info.country);
+		});
+
+		countries.forEach((country) => {
+			const entry = Object.values(MANUFACTURER_INFO).find((value) => value.country === country);
+			const code = entry ? entry.countryCode : '';
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'country-filter-btn';
+			btn.dataset.country = country;
+			btn.innerHTML = `<img src="https://flagcdn.com/24x18/${code}.png" srcset="https://flagcdn.com/48x36/${code}.png 2x" width="24" height="18" alt=""><span>${country}</span>`;
+			btn.addEventListener('click', () => setActiveCountry(country));
+			countryFilterContainer.appendChild(btn);
+		});
+
 		manufacturers.forEach((manufacturer) => {
 			const group = document.createElement('div');
 			group.className = 'manufacturer-group';
+			const manufacturerInfo = MANUFACTURER_INFO[manufacturer] || null;
+			group.dataset.country = manufacturerInfo ? manufacturerInfo.country : '';
 
 			const heading = document.createElement('h3');
 			heading.className = 'group';
@@ -345,6 +460,18 @@
 			nameSpan.className = 'mfr-name';
 			nameSpan.textContent = manufacturer;
 
+			const flagImg = document.createElement('img');
+			flagImg.className = 'mfr-flag';
+			if (manufacturerInfo) {
+				flagImg.src = `https://flagcdn.com/24x18/${manufacturerInfo.countryCode}.png`;
+				flagImg.srcset = `https://flagcdn.com/48x36/${manufacturerInfo.countryCode}.png 2x`;
+				flagImg.alt = manufacturerInfo.country;
+				flagImg.title = manufacturerInfo.country + (manufacturerInfo.hq ? ' — sede: ' + manufacturerInfo.hq : '');
+			} else {
+				flagImg.alt = '';
+				flagImg.hidden = true;
+			}
+
 			const chevron = document.createElement('span');
 			chevron.className = 'mfr-chevron';
 			chevron.setAttribute('aria-hidden', 'true');
@@ -356,16 +483,17 @@
 			prevBtn.type = 'button';
 			prevBtn.className = 'mfr-nav-btn prev';
 			prevBtn.setAttribute('aria-label', 'Modelos anteriores');
-			prevBtn.textContent = '‹';
+			prevBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"></polyline></svg>';
 			prevBtn.disabled = true;
 			const nextBtn = document.createElement('button');
 			nextBtn.type = 'button';
 			nextBtn.className = 'mfr-nav-btn next';
 			nextBtn.setAttribute('aria-label', 'Próximos modelos');
-			nextBtn.textContent = '›';
+			nextBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>';
 			nextBtn.disabled = true;
 			nav.append(prevBtn, nextBtn);
 
+			toggleBtn.appendChild(flagImg);
 			toggleBtn.appendChild(nameSpan);
 			toggleBtn.appendChild(chevron);
 			heading.appendChild(toggleBtn);
@@ -381,7 +509,7 @@
 			const grid = document.createElement('div');
 			grid.className = 'aircraft-grid mt-0 rounded-b-[12px] bg-[#edf3fb] grid items-start gap-5 md:grid-cols-3 mb-8';
 			const track = document.createElement('div');
-			track.className = 'flex gap-5 overflow-x-hidden scroll-smooth snap-x snap-mandatory md:gap-6';
+			track.className = 'aircraft-track flex items-start gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-3 md:gap-6';
 			track.style.gridColumn = '1 / -1';
 			grid.appendChild(track);
 
