@@ -2,42 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes hero-float {
-  0%, 100% { transform: translateY(0px) rotate(-2deg); }
-  50% { transform: translateY(-18px) rotate(2deg); }
-}
-
 @keyframes hero-glow {
   0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
   50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.08); }
-}
-
-@keyframes hero-twinkle {
-  0%, 100% { opacity: .15; }
-  50% { opacity: 1; }
-}
-
-.hero-plane {
-  animation: hero-float 6s ease-in-out infinite;
-  will-change: transform;
 }
 
 .hero-glow {
   animation: hero-glow 5s ease-in-out infinite;
 }
 
-.hero-star {
-  animation: hero-twinkle 3.2s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .hero-plane,
-  .hero-glow,
-  .hero-star {
+  .hero-glow {
     animation: none;
-  }
-  .hero-star {
-    opacity: .5;
   }
 }
 
@@ -50,69 +26,9 @@
   display: none;
 }
 
-/* ---- Rig 3D do hero (parallax dirigido por scroll) -----------------------
-   Tailwind v3 não tem utilitários para perspective / perspective-origin /
-   transform-style / backface-visibility (chegaram só no v4), então ficam
-   aqui como CSS de verdade.
-
-   ATENÇÃO ao mexer nisto: nenhum elemento dentro da cadeia preserve-3d
-   (#hero-sky, #hero-content, #hero-grid, #hero-plane-layer/-scroll/-pointer,
-   #hero-front) pode receber overflow, opacity < 1, filter, mask, clip-path,
-   contain:paint ou will-change:opacity — qualquer um desses é uma
-   "grouping property" que achata o contexto 3D silenciosamente, sem erro
-   nenhum no console. Filtro numa folha sem filhos 3D (ex.: blur numa nuvem)
-   é seguro. #hero-veil é 2D puro de propósito, fora dessa cadeia. */
-:root {
-  --hero-persp: 1200px;
-}
-
-#hero {
-  perspective: var(--hero-persp);
-  perspective-origin: 50% 55%;
-}
-
-#hero-sky,
-#hero-content,
-#hero-grid,
-#hero-plane-layer,
-#hero-plane-scroll,
-#hero-plane-pointer,
-#hero-front {
-  transform-style: preserve-3d;
-}
-
-.hero-layer {
-  position: absolute;
-  backface-visibility: hidden;
-}
-
-/* will-change só enquanto o hero está com o ScrollTrigger ativo
-   (ver onToggle -> #hero.is-live no hero.js) */
-#hero.is-live .hero-layer,
-#hero.is-live #hero-plane-scroll,
-#hero.is-live #hero-plane-pointer {
-  will-change: transform;
-}
-
-/* Lenis — equivalente a lenis/dist/lenis.css, embutido aqui para manter
-   uma única fonte de CSS no projeto. */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
+/* will-change no vídeo e no conteúdo do hero só enquanto o ScrollTrigger
+   está ativo (ver onToggle -> #hero.is-live no hero.js) */
+#hero.is-live #hero-video,
+#hero.is-live #hero-copy {
+  will-change: transform, opacity;
 }
