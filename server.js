@@ -604,6 +604,57 @@ app.get('/api/flights/featured', async (req, res) => {
   }
 });
 
+app.post('/api/translate', async (req, res) => {
+  const apiKey = process.env.DEEPL_API_KEY;
+
+  if (!apiKey) {
+    return res.status(400).json({
+      error: 'DEEPL_API_KEY não configurado. Adicione a chave no arquivo .env.'
+    });
+  }
+
+  const text = String(req.body?.text || '').trim();
+
+  if (!text) {
+    return res.status(400).json({ error: 'Campo "text" é obrigatório.' });
+  }
+
+  const targetLang = String(req.body?.target_lang || 'EN-US').toUpperCase();
+  const sourceLang = req.body?.source_lang ? String(req.body.source_lang).toUpperCase() : 'PT';
+  // Chaves do plano gratuito do DeepL terminam em ":fx" e usam um domínio de API separado.
+  const apiUrl = apiKey.trim().endsWith(':fx')
+    ? 'https://api-free.deepl.com/v2/translate'
+    : 'https://api.deepl.com/v2/translate';
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `DeepL-Auth-Key ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: [text], target_lang: targetLang, source_lang: sourceLang })
+    });
+
+    if (!response.ok) {
+      const details = await response.text();
+      return res.status(response.status).json({
+        error: 'Erro ao consultar a API do DeepL.',
+        details
+      });
+    }
+
+    const data = await response.json();
+    const translated = data?.translations?.[0]?.text || text;
+    return res.json({ translated });
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Falha ao acessar a API do DeepL.',
+      details: error.message
+    });
+  }
+});
+
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'Rota não encontrada' });

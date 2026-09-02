@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="description" content="Compare dois modelos de aeronaves lado a lado: autonomia, capacidade de passageiros e velocidade de cruzeiro.">
+	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<title>Comparar | Aviator Info</title>
+	<link rel="stylesheet" href="./dist/tailwind.css">
+	<style>
+		.cmp-panel {
+			border-radius: 1rem;
+			border: 2px solid rgba(15, 23, 42, 0.1);
+			background: #fff;
+			padding: 1.1rem;
+			transition: border-color 200ms ease, box-shadow 200ms ease;
+		}
+		.cmp-panel[data-slot="1"] { --slot-color: #2a78d6; --slot-color-wash: rgba(42, 120, 214, 0.08); }
+		.cmp-panel[data-slot="2"] { --slot-color: #eb6834; --slot-color-wash: rgba(235, 104, 52, 0.08); }
+		.cmp-panel.has-pick { border-color: var(--slot-color); background: var(--slot-color-wash); box-shadow: 0 10px 22px rgba(16, 45, 85, 0.1); }
+
+		.cmp-combobox { position: relative; }
+		.cmp-input {
+			width: 100%;
+			border-radius: 0.75rem;
+			border: 1px solid rgba(15, 23, 42, 0.15);
+			background: #fff;
+			padding: 0.7rem 0.9rem;
+			font-size: 0.92rem;
+			color: #102d55;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.cmp-input:focus { outline: none; border-color: var(--slot-color, #1261bd); box-shadow: 0 0 0 3px color-mix(in srgb, var(--slot-color, #1261bd) 22%, transparent); }
+		.cmp-input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+		.cmp-list {
+			position: absolute;
+			z-index: 30;
+			top: calc(100% + 6px);
+			left: 0;
+			right: 0;
+			max-height: 260px;
+			overflow-y: auto;
+			border-radius: 0.75rem;
+			border: 1px solid rgba(15, 23, 42, 0.12);
+			background: #fff;
+			box-shadow: 0 16px 32px rgba(16, 45, 85, 0.18);
+			padding: 0.35rem;
+		}
+		.cmp-option {
+			display: block;
+			width: 100%;
+			text-align: left;
+			border: none;
+			background: transparent;
+			border-radius: 0.5rem;
+			padding: 0.55rem 0.7rem;
+			font-size: 0.86rem;
+			color: #102d55;
+			cursor: pointer;
+		}
+		.cmp-option strong { color: #1261bd; }
+		.cmp-option:hover, .cmp-option.is-active { background: #eef5fe; }
+		.cmp-empty { padding: 0.6rem 0.7rem; font-size: 0.85rem; color: #64748b; }
+
+		.cmp-preview { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.9rem; }
+		.cmp-preview img {
+			width: 4.5rem;
+			height: 3.4rem;
+			object-fit: cover;
+			border-radius: 0.6rem;
+			box-shadow: 0 4px 10px rgba(2, 6, 23, 0.18);
+			flex-shrink: 0;
+		}
+		.cmp-preview-name { font-weight: 800; color: #102d55; font-size: 0.98rem; line-height: 1.25; }
+		.cmp-preview-meta { font-size: 0.76rem; color: #48576b; }
+
+		.cmp-vs {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 3.4rem;
+			height: 3.4rem;
+			border-radius: 9999px;
+			background: #102d55;
+			color: #fff;
+			font-weight: 900;
+			font-size: 0.85rem;
+			letter-spacing: 0.05em;
+			box-shadow: 0 8px 18px rgba(16, 45, 85, 0.3);
+			justify-self: center;
+		}
+
+		#compare-results { animation: cmp-fade-in 380ms ease; }
+		@keyframes cmp-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+		.cmp-legend-swatch { display: inline-block; width: 0.65rem; height: 0.65rem; border-radius: 9999px; }
+
+		.cmp-table { width: 100%; min-width: 560px; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; }
+		.cmp-table th, .cmp-table td { padding: 0.6rem 0.75rem; text-align: left; white-space: nowrap; border-bottom: 1px solid #e2e8f0; }
+		.cmp-table th { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #52514e; }
+		.cmp-table td { color: #102d55; font-weight: 600; }
+		.cmp-winner-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 800; }
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+		}
+	</style>
+</head>
+	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+	<header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
+		<div class="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
+			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./index.html" aria-label="Ir para a página principal"><img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="./images/AviatorLogo.png" alt="Aviator Info"></a>
+			<nav class="no-scrollbar flex items-center gap-0.5 overflow-x-auto sm:gap-2">
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./modelos.html">Modelos</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./aeroportos.html">Aeroportos</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./companhias.html">Companhias</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./simulacao.html">Simulação</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-2 text-[13px] font-semibold text-[#1a56c4] shadow-sm sm:px-5 sm:text-base" href="./comparar.html" aria-current="page">Comparar</a>
+			</nav>
+		</div>
+	</header>
+	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Comparar</h1>
+		<p class="max-w-[700px] text-lg leading-[1.6] text-[#18283b]">Escolha duas aeronaves do nosso catálogo e veja lado a lado quem sai na frente em autonomia, capacidade e velocidade de cruzeiro.</p>
+
+		<section class="mt-8 rounded-2xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(16,45,85,0.12)] sm:p-8" aria-labelledby="compare-title">
+			<h2 id="compare-title" class="sr-only">Comparador de aeronaves</h2>
+			<p class="mb-4 text-sm font-bold uppercase tracking-[1.5px] text-[#1261bd]">Escolha as duas aeronaves</p>
+
+			<div class="grid items-start gap-4 sm:grid-cols-[1fr_auto_1fr]">
+				<div class="cmp-panel" data-slot="1">
+					<label for="cmp-input-1" class="mb-1 block text-sm font-semibold text-[#102d55]">Aeronave 1</label>
+					<div class="cmp-combobox">
+						<input type="text" id="cmp-input-1" class="cmp-input" placeholder="Pesquisar modelo..." autocomplete="off" aria-expanded="false" role="combobox" aria-autocomplete="list">
+						<div id="cmp-list-1" class="cmp-list hidden" role="listbox"></div>
+					</div>
+					<div id="cmp-preview-1" class="cmp-preview hidden"></div>
+				</div>
+
+				<div class="cmp-vs" aria-hidden="true">VS</div>
+
+				<div class="cmp-panel" data-slot="2">
+					<label for="cmp-input-2" class="mb-1 block text-sm font-semibold text-[#102d55]">Aeronave 2</label>
+					<div class="cmp-combobox">
+						<input type="text" id="cmp-input-2" class="cmp-input" placeholder="Pesquisar modelo..." autocomplete="off" aria-expanded="false" role="combobox" aria-autocomplete="list">
+						<div id="cmp-list-2" class="cmp-list hidden" role="listbox"></div>
+					</div>
+					<div id="cmp-preview-2" class="cmp-preview hidden"></div>
+				</div>
+			</div>
+
+			<p id="cmp-error" class="mt-4 hidden text-sm font-semibold text-rose-700" role="alert"></p>
+
+			<button id="cmp-button" type="button" class="mt-6 w-full rounded-xl bg-[#1261bd] px-6 py-3.5 text-base font-bold text-white shadow-[0_10px_24px_rgba(18,97,189,0.28)] transition hover:bg-[#102d55] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50" disabled>
+				⚖️ Comparar modelos
+			</button>
+
+			<div id="compare-results" class="mt-8 hidden border-t border-slate-200 pt-8">
+				<p class="mb-1 text-sm font-bold uppercase tracking-[1.5px] text-[#1261bd]">📊 Resultado da comparação</p>
+				<p class="mb-6 text-sm text-[#48576b]">Baseado nos parâmetros reais do nosso catálogo: autonomia, capacidade de passageiros e velocidade de cruzeiro.</p>
+
+				<div id="cmp-legend" class="mb-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold text-[#102d55]"></div>
+
+				<div class="mx-auto w-full max-w-[420px]">
+					<svg id="cmp-radar" viewBox="0 0 400 400" role="img" aria-labelledby="cmp-radar-title" class="w-full"><title id="cmp-radar-title">Gráfico radar comparando as duas aeronaves selecionadas</title></svg>
+				</div>
+
+				<div class="mt-8 overflow-x-auto rounded-xl border border-slate-200">
+					<table class="cmp-table">
+						<thead>
+							<tr>
+								<th scope="col">Parâmetro</th>
+								<th scope="col" id="cmp-th-1" style="color:#2a78d6;"></th>
+								<th scope="col" id="cmp-th-2" style="color:#eb6834;"></th>
+								<th scope="col">Melhor</th>
+							</tr>
+						</thead>
+						<tbody id="cmp-table-body"></tbody>
+					</table>
+				</div>
+
+				<button id="cmp-reset" type="button" class="mt-6 rounded-xl border border-slate-900/15 bg-white px-5 py-2.5 text-sm font-semibold text-[#102d55] shadow-sm transition hover:bg-slate-50">
+					Nova comparação
+				</button>
+			</div>
+		</section>
+	</main>
+	<script src="./aircraft-data.js"></script>
+	<script src="./comparar.js"></script>
+	<script src="./bob-chatbot.js"></script>
+</body>
+</html>

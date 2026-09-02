@@ -108,6 +108,10 @@
 		rastreio: {
 			label: 'Rastreio',
 			desc: 'dá para rastrear um voo em tempo real digitando o número IATA, acompanhando rota, status, altitude e velocidade.'
+		},
+		comparar: {
+			label: 'Comparar',
+			desc: 'dá para comparar duas aeronaves lado a lado, com gráfico de radar mostrando autonomia, capacidade e velocidade de cruzeiro de cada uma.'
 		}
 	};
 
@@ -117,47 +121,140 @@
 		'aeroportos': 'aeroportos',
 		'pista': 'aeroportos',
 		'pistas': 'aeroportos',
+		'airport': 'aeroportos',
+		'airports': 'aeroportos',
+		'runway': 'aeroportos',
 		'rastrear': 'rastreio',
 		'rastreio': 'rastreio',
 		'rastreamento': 'rastreio',
 		'tempo real': 'rastreio',
 		'ao vivo': 'rastreio',
+		'track flight': 'rastreio',
+		'flight tracking': 'rastreio',
+		'live tracking': 'rastreio',
+		'real time': 'rastreio',
 		'simular': 'simulacao',
 		'simulacao': 'simulacao',
 		'simulador': 'simulacao',
 		'tempo de voo': 'simulacao',
 		'quanto tempo demora': 'simulacao',
+		'simulate flight': 'simulacao',
+		'flight simulator': 'simulacao',
+		'flight time': 'simulacao',
 		'modelos': 'modelos',
 		'quais avioes': 'modelos',
 		'quais aeronaves': 'modelos',
 		'catalogo': 'modelos',
+		'aircraft models': 'modelos',
+		'plane models': 'modelos',
+		'which planes': 'modelos',
+		'which aircraft': 'modelos',
+		'catalog': 'modelos',
 		'companhias': 'companhias',
 		'companhia aerea': 'companhias',
 		'cia aerea': 'companhias',
-		'quais companhias': 'companhias'
+		'quais companhias': 'companhias',
+		'airline': 'companhias',
+		'airlines': 'companhias',
+		'which airlines': 'companhias',
+		'comparar': 'comparar',
+		'comparacao': 'comparar',
+		'comparar aeronaves': 'comparar',
+		'comparar avioes': 'comparar',
+		'comparar modelos': 'comparar',
+		'compare': 'comparar',
+		'comparison': 'comparar',
+		'compare aircraft': 'comparar',
+		'compare planes': 'comparar'
 	};
 
 	const AVIATION_KEYWORDS = [
-		'aviao', 'aviaozinho', 'aeronave', 'aeronaves', 'voo', 'voos', 'voar', 'aeroporto', 'aeroportos',
-		'piloto', 'pilotos', 'comissario', 'comissaria', 'tripulacao', 'cockpit', 'cabine', 'turbina',
-		'motor', 'motores', 'reator', 'motor a jato', 'helice', 'turboelice', 'asa', 'asas', 'fuselagem',
-		'decolagem', 'pouso', 'aterrissagem', 'altitude', 'turbulencia', 'radar', 'torre de controle',
-		'hangar', 'combustivel', 'querosene', 'mach', 'velocidade de cruzeiro', 'autonomia', 'passageiro',
-		'passageiros', 'companhia aerea', 'cia aerea', 'fabricante', 'jato', 'aviacao', 'aerodinamica',
+		'aviao', 'avioes', 'aviaozinho', 'aeronave', 'aeronaves', 'voo', 'voos', 'voar', 'voando', 'voado',
+		'aeroporto', 'aeroportos', 'aeroportuario', 'piloto', 'pilotos', 'pilotar', 'pilotagem', 'aviador',
+		'aviadora', 'aviadores', 'comissario', 'comissaria', 'comissarios', 'comissarias', 'tripulacao',
+		'tripulante', 'tripulantes', 'cockpit', 'cabine', 'cabine de comando', 'turbina', 'motor', 'motores',
+		'reator', 'motor a jato', 'helice', 'turboelice', 'asa', 'asas', 'fuselagem', 'trem de pouso',
+		'flaps', 'checklist', 'caixa preta', 'decolagem', 'pouso', 'aterrissagem', 'altitude', 'turbulencia',
+		'radar', 'torre de controle', 'trafego aereo', 'espaco aereo', 'hangar', 'combustivel', 'querosene',
+		'mach', 'velocidade de cruzeiro', 'autonomia', 'passageiro', 'passageiros', 'companhia aerea',
+		'companhias aereas', 'cia aerea', 'aereo', 'aerea', 'aereos', 'aereas', 'fabricante', 'fabricantes',
+		'jato', 'jatos', 'aviacao', 'aviacao comercial', 'aeronautica', 'aeronautico', 'aerodinamica',
+		'helicoptero', 'helicopteros', 'sobrevoar', 'malha aerea', 'rota aerea', 'rotas aereas',
 		'iata', 'icao', 'check-in', 'bagagem', 'escala', 'tarifa aerea', 'classe economica', 'primeira classe'
 	];
 
 	// ---------------------------------------------------------------------
 	// Utilidades de texto
 	// ---------------------------------------------------------------------
+	// Abreviações comuns de chat/internet em português — expandidas para a
+	// forma "completa" logo na normalização, assim TODAS as listas de palavras
+	// e frases do bot (agradecimento, afirmação, saudação etc.) já entendem
+	// "obg", "vc", "tmj" e afinal sem precisar duplicar cada abreviação em
+	// cada lista separadamente.
+	const ABBREVIATIONS = {
+		'obg': 'obrigado', 'obgd': 'obrigado', 'obgda': 'obrigada', 'vlw': 'valeu', 'vlws': 'valeu',
+		'tmj': 'sim', 'tmjj': 'sim', 'pq': 'porque', 'sla': 'sei la', 'slk': 'sei la',
+		'vc': 'voce', 'vcs': 'voces', 'blz': 'beleza', 'mto': 'muito', 'mt': 'muito',
+		'td': 'tudo', 'tds': 'todos', 'qnd': 'quando', 'qm': 'quem', 'pfv': 'por favor',
+		'pfvr': 'por favor', 'dps': 'depois', 'hj': 'hoje', 'agr': 'agora', 'tb': 'tambem',
+		'tbm': 'tambem', 'naum': 'nao', 'axo': 'acho', 'eh': 'e', 'qlqr': 'qualquer'
+	};
+
+	// Vocabulário de aviação em inglês traduzido para o termo em português já
+	// reconhecido pelo bot — assim "plane", "aircraft", "airport", "pilot" etc.
+	// caem automaticamente nas mesmas AVIATION_KEYWORDS/FEATURE_ALIASES/
+	// ASPIRATION_ROLES sem duplicar cada lista em inglês. Só traduz palavras de
+	// conteúdo (substantivos), nunca palavras gramaticais (who/are/you/want...)
+	// — essas dependem da ordem da frase e são tratadas à parte, como frases
+	// literais em inglês nas próprias listas de intenção (ver isAboutBob,
+	// ASPIRATION_TRIGGERS, SELF_QUESTION_TRIGGERS etc.), pois traduzir palavra
+	// por palavra quebraria a sequência exigida por essas frases.
+	const ENGLISH_TERMS = {
+		'airplane': 'aviao', 'airplanes': 'avioes', 'plane': 'aviao', 'planes': 'avioes',
+		'aircraft': 'aeronave', 'flight': 'voo', 'flights': 'voos', 'flying': 'voando',
+		'airport': 'aeroporto', 'airports': 'aeroportos',
+		'pilot': 'piloto', 'pilots': 'pilotos', 'captain': 'comandante',
+		'attendant': 'comissario', 'attendants': 'comissarios', 'stewardess': 'comissaria', 'steward': 'comissario',
+		'controller': 'controlador de trafego aereo', 'engineer': 'engenheiro aeronautico',
+		'mechanic': 'mecanico de aeronaves', 'dispatcher': 'despachante operacional',
+		'crew': 'tripulacao', 'cabin': 'cabine', 'engine': 'motor', 'engines': 'motores',
+		'turbine': 'turbina', 'propeller': 'helice', 'wing': 'asa', 'wings': 'asas', 'fuselage': 'fuselagem',
+		'takeoff': 'decolagem', 'landing': 'pouso', 'turbulence': 'turbulencia',
+		'fuel': 'combustivel', 'kerosene': 'querosene', 'speed': 'velocidade', 'range': 'autonomia',
+		'passenger': 'passageiro', 'passengers': 'passageiros',
+		'airline': 'companhia aerea', 'airlines': 'companhias aereas',
+		'manufacturer': 'fabricante', 'manufacturers': 'fabricantes',
+		'jet': 'jato', 'jets': 'jatos', 'aviation': 'aviacao', 'aerodynamics': 'aerodinamica',
+		'baggage': 'bagagem', 'luggage': 'bagagem', 'layover': 'escala', 'stopover': 'escala',
+		'helicopter': 'helicoptero', 'helicopters': 'helicopteros',
+		'models': 'modelos', 'model': 'modelo', 'company': 'companhia', 'companies': 'companhias',
+		'track': 'rastrear', 'tracking': 'rastreio', 'simulate': 'simular', 'simulation': 'simulacao',
+		'compare': 'comparar', 'comparison': 'comparacao'
+	};
+
+	function expandAbbreviations(text) {
+		return text
+			.split(' ')
+			.map((w) => ABBREVIATIONS[w] || ENGLISH_TERMS[w] || w)
+			.join(' ');
+	}
+
+	// Reduz letras repetidas 3+ vezes seguidas a uma só ("oiiiiii" -> "oi",
+	// "aaaajuda" -> "ajuda"), sem mexer em palavras com dobra legítima
+	// ("carro", "isso" só têm 2 repetições seguidas).
+	function collapseRepeatedLetters(text) {
+		return text.replace(/([a-z])\1{2,}/g, '$1');
+	}
+
 	function normalize(str) {
-		return String(str || '')
+		const base = String(str || '')
 			.toLowerCase()
 			.normalize('NFD')
 			.replace(/[̀-ͯ]/g, '')
 			.replace(/[^a-z0-9\s]/g, ' ')
 			.replace(/\s+/g, ' ')
 			.trim();
+		return expandAbbreviations(collapseRepeatedLetters(base)).replace(/\s+/g, ' ').trim();
 	}
 
 	// Distância de Levenshtein simples, usada para tolerar erros de digitação
@@ -259,45 +356,226 @@
 	}
 
 	// Frases de saudação específicas o bastante para valer em qualquer mensagem.
-	const GREETING_PHRASES = ['bom dia', 'boa tarde', 'boa noite', 'fala ae bob', 'fala bob', 'eae bob', 'e ai bob'];
-	// Palavras soltas comuns demais (podem aparecer dentro de perguntas reais,
-	// tipo "me fala mais sobre..." ou "bob, qual o alcance..."), então só contam
-	// como saudação quando a mensagem inteira é curta.
-	const GREETING_SHORT_WORDS = ['oi', 'ola', 'opa', 'eae', 'e ai', 'hey', 'hello', 'salve', 'bob', 'fala', 'falae', 'fala ae'];
+	// Inclui variantes em inglês ("good morning" etc.) para aceitar cumprimentos
+	// nesse idioma também.
+	const GREETING_PHRASES = [
+		'bom dia', 'boa tarde', 'boa noite', 'fala ae bob', 'fala bob', 'eae bob', 'e ai bob',
+		'good morning', 'good afternoon', 'good evening', 'good night'
+	];
+	// Palavras/frases curtas comuns demais (podem aparecer dentro de perguntas
+	// reais, tipo "me fala mais sobre..." ou "bob, qual o alcance..."), então só
+	// contam como saudação quando a mensagem inteira é curta.
+	const GREETING_SHORT_WORDS = [
+		'oi', 'ola', 'opa', 'eae', 'e ai', 'hey', 'hello', 'salve', 'bob', 'fala', 'falae', 'fala ae', 'beleza',
+		'hi', 'howdy', 'yo', 'sup', 'greetings'
+	];
+	// Apelidos/gírias grudadas no nome do bot ("bobzada", "boborrr", "bobzão")
+	// só valem como saudação na mesma mensagem curta — evita pegar "bob" no
+	// meio de uma pergunta de verdade.
+	function hasWordStartingWith(norm, prefix) {
+		return wordsOf(norm).some((w) => w.length > prefix.length && w.startsWith(prefix));
+	}
 	function isGreeting(norm) {
 		if (GREETING_PHRASES.some((w) => hasWord(norm, w))) return true;
 		if (wordsOf(norm).length > 3) return false;
-		return GREETING_SHORT_WORDS.some((w) => hasWord(norm, w));
+		if (GREETING_SHORT_WORDS.some((w) => hasWord(norm, w))) return true;
+		return hasWordStartingWith(norm, 'bob');
 	}
 
-	const THANKS_WORDS = ['obrigado', 'obrigada', 'valeu', 'vlw', 'thanks', 'brigado', 'brigada'];
+	// Perguntas de "tudo bem com você?" dirigidas ao próprio Bob — diferente de
+	// uma saudação simples, aqui a pessoa quer mesmo saber como ele está, então
+	// merece uma resposta de verdade em vez do "oi, como posso ajudar" genérico.
+	// As frases com "você/vc" explícito valem em qualquer mensagem; as curtas e
+	// ambíguas ("vai bem", "tudo em cima") só contam se a mensagem inteira for
+	// curta, senão pegariam frases reais tipo "esse avião vai bem em turbulência?".
+	const WELLBEING_PHRASES = [
+		'como voce esta', 'como vc esta', 'como voce ta', 'como vc ta', 'voce esta bem', 'vc esta bem',
+		'voce ta bem', 'vc ta bem', 'tudo bem com voce', 'tudo bem contigo', 'como voce vai', 'voce vai bem',
+		'vc vai bem', 'esta tudo bem com voce', 'e voce como esta', 'e voce como vai',
+		'how are you', 'how are you doing', 'are you ok', 'are you okay', 'you doing well'
+	];
+	const WELLBEING_SHORT_WORDS = ['tudo bem', 'tudo bom', 'ta bem', 'ta bom', 'ta tudo bem', 'como vai', 'vai bem', 'tudo em cima', 'tudo joia', 'como anda', 'de boa', 'suave'];
+	function isWellbeingQuestion(norm) {
+		if (WELLBEING_PHRASES.some((w) => hasWord(norm, w))) return true;
+		if (wordsOf(norm).length > 4) return false;
+		return WELLBEING_SHORT_WORDS.some((w) => hasWord(norm, w));
+	}
+
+	// Depois que o Bob pergunta "e você, tudo certo?", a resposta do usuário
+	// ("sim", "estou bem", "não muito bem"...) precisa ser lida nesse contexto —
+	// checa negativo primeiro porque "não estou bem" contém a palavra "bem".
+	const WELLBEING_REPLY_NEGATIVE_WORDS = [
+		'nao estou bem', 'nao to bem', 'nao muito bem', 'nao tao bem', 'nao esta bem', 'nao tudo bem',
+		'mal', 'pessimo', 'ruim', 'cansado', 'cansada', 'triste', 'meio mal', 'enjoado', 'enjoada',
+		'estressado', 'estressada', 'doente', 'nao', 'negativo',
+		'not good', 'not well', 'not great', 'bad', 'sad', 'tired', 'terrible', 'awful'
+	];
+	const WELLBEING_REPLY_POSITIVE_WORDS = [
+		'bem', 'otimo', 'excelente', 'numa boa', 'tranquilo', 'joia', 'top', 'daora', 'massa', 'show',
+		'sim', 'com certeza', 'claro', 'demais', 'suave', 'de boa', 'tudo certo', 'tudo em ordem', 'tudo joia',
+		'good', 'great', 'fine', 'well', 'awesome', 'excellent'
+	];
+	function isWellbeingReplyNegative(norm) {
+		return WELLBEING_REPLY_NEGATIVE_WORDS.some((w) => hasWord(norm, w));
+	}
+	function isWellbeingReplyPositive(norm) {
+		return WELLBEING_REPLY_POSITIVE_WORDS.some((w) => hasWord(norm, w));
+	}
+
+	const THANKS_WORDS = ['obrigado', 'obrigada', 'valeu', 'vlw', 'thanks', 'brigado', 'brigada', 'thank you', 'thx', 'ty', 'appreciate it'];
 	function isThanks(norm) {
 		return THANKS_WORDS.some((w) => hasWord(norm, w));
 	}
 
-	const FAREWELL_WORDS = ['tchau', 'ate mais', 'ate logo', 'falou', 'flw', 'adeus', 'ate a proxima'];
+	const FAREWELL_WORDS = ['tchau', 'ate mais', 'ate logo', 'falou', 'flw', 'adeus', 'ate a proxima', 'bye', 'goodbye', 'see you', 'see ya', 'later', 'farewell'];
 	function isFarewell(norm) {
 		return FAREWELL_WORDS.some((w) => hasWord(norm, w));
 	}
 
-	const AFFIRM_WORDS = ['sim', 'com certeza', 'claro', 'quero sim', 'pode ser', 'bora', 'uhum', 'aham', 'exatamente', 'positivo', 'afirmativo'];
+	const AFFIRM_WORDS = [
+		'sim', 'com certeza', 'claro', 'quero sim', 'pode ser', 'bora', 'uhum', 'aham', 'exatamente', 'positivo', 'afirmativo',
+		'yes', 'yeah', 'yep', 'yup', 'sure', 'of course', 'okay', 'certainly', 'absolutely'
+	];
 	function isAffirmative(norm) {
 		return AFFIRM_WORDS.some((w) => hasWord(norm, w));
 	}
 
-	const NEGATIVE_WORDS = ['nao', 'negativo', 'nunca', 'deixa pra la', 'agora nao'];
+	const NEGATIVE_WORDS = ['nao', 'negativo', 'nunca', 'deixa pra la', 'agora nao', 'sei la', 'no', 'nope', 'never', 'i dont know', 'dunno', 'idk', 'not sure'];
 	function isNegative(norm) {
 		return NEGATIVE_WORDS.some((w) => hasWord(norm, w));
 	}
 
 	function isAboutBob(norm) {
 		return hasWord(norm, 'quem e voce') || hasWord(norm, 'quem e vc') || hasWord(norm, 'seu nome') ||
-			hasWord(norm, 'voce e quem') || hasWord(norm, 'quem e o bob');
+			hasWord(norm, 'voce e quem') || hasWord(norm, 'quem e o bob') ||
+			hasWord(norm, 'who are you') || hasWord(norm, 'what is your name') || hasWord(norm, 'whats your name') || hasWord(norm, 'your name');
+	}
+
+	// Profissões da aviação que o Bob reconhece para incentivar quem diz que
+	// quer seguir esse caminho ou pergunta se teria perfil para ele.
+	const ASPIRATION_ROLES = {
+		'piloto': 'piloto',
+		'pilota': 'piloto',
+		'aviador': 'piloto',
+		'aviadora': 'piloto',
+		'comandante': 'comandante',
+		'copiloto': 'copiloto',
+		'comissario': 'comissário de bordo',
+		'comissaria': 'comissária de bordo',
+		'aeromoça': 'comissária de bordo',
+		'aeromoco': 'comissário de bordo',
+		'controlador de voo': 'controlador de tráfego aéreo',
+		'controlador de trafego aereo': 'controlador de tráfego aéreo',
+		'engenheiro aeronautico': 'engenheiro aeronáutico',
+		'engenheira aeronautica': 'engenheira aeronáutica',
+		'mecanico de aeronaves': 'mecânico de aeronaves',
+		'mecanico de aviao': 'mecânico de aviões',
+		'despachante operacional': 'despachante operacional de voo',
+		'co pilot': 'copiloto'
+	};
+
+	// Correspondência exata (sem tolerância a erro de digitação) — necessária
+	// aqui porque termos como "piloto" e "copiloto" têm distância de edição
+	// pequena e a busca fuzzy de hasWord os confundiria entre si.
+	function hasExactWord(norm, phrase) {
+		const p = normalize(phrase);
+		if (!p) return false;
+		return (' ' + norm + ' ').indexOf(' ' + p + ' ') !== -1;
+	}
+
+	function findAviationRole(norm) {
+		const keys = Object.keys(ASPIRATION_ROLES).sort((a, b) => b.length - a.length);
+		for (const alias of keys) {
+			if (hasExactWord(norm, alias)) return ASPIRATION_ROLES[alias];
+		}
+		return null;
+	}
+
+	// "Eu queria ser piloto", "meu sonho é ser comissária" etc. — o usuário
+	// declara o que quer ser. Só conta como aspiração de aviação quando junto
+	// tem uma das profissões de ASPIRATION_ROLES. Inclui as mesmas frases em
+	// inglês ("I want to be a pilot" etc.) — ficam sem tradução propositalmente
+	// (ver ENGLISH_TERMS), então precisam estar aqui por extenso.
+	const ASPIRATION_TRIGGERS = [
+		'quero ser', 'queria ser', 'gostaria de ser', 'sonho em ser', 'sonho ser',
+		'meu sonho e ser', 'pretendo ser', 'vou ser', 'quero me tornar', 'queria me tornar',
+		'tenho vontade de ser', 'um dia quero ser', 'um dia serei',
+		'i want to be', 'i wanted to be', 'i wish to be', 'i dream of being',
+		'i plan to be', 'my dream is to be', 'i would like to be', 'going to be'
+	];
+	function findAspirationRole(norm) {
+		const hasTrigger = ASPIRATION_TRIGGERS.some((t) => hasWord(norm, t));
+		if (!hasTrigger) return null;
+		return findAviationRole(norm);
+	}
+
+	// Perguntas em que o usuário busca validação sobre si mesmo ("você acha que
+	// eu dou pra piloto?", "será que eu consigo?") — o Bob deve sempre acolher
+	// e incentivar, com ou sem uma profissão específica identificada.
+	const SELF_QUESTION_TRIGGERS = [
+		'voce acha que eu', 'acha que eu', 'sera que eu', 'eu seria um bom', 'eu seria uma boa',
+		'eu daria um bom', 'eu daria uma boa', 'eu dou pra', 'eu levo jeito', 'tenho jeito para',
+		'consigo ser um bom', 'consigo ser uma boa', 'sou capaz de ser', 'eu teria talento',
+		'do you think i', 'would i make a good', 'would i be a good', 'am i good enough', 'do i have what it takes'
+	];
+	function isSelfQuestion(norm) {
+		return SELF_QUESTION_TRIGGERS.some((t) => hasWord(norm, t));
 	}
 
 	function isHelp(norm) {
 		return hasWord(norm, 'ajuda') || hasWord(norm, 'menu') || hasWord(norm, 'o que voce sabe') ||
-			hasWord(norm, 'o que posso perguntar') || hasWord(norm, 'o que voce faz') || hasWord(norm, 'me ajuda');
+			hasWord(norm, 'o que posso perguntar') || hasWord(norm, 'o que voce faz') || hasWord(norm, 'me ajuda') ||
+			hasWord(norm, 'help') || hasWord(norm, 'what can you do') || hasWord(norm, 'what do you know') || hasWord(norm, 'what can i ask');
+	}
+
+	// Pedido de aeronaves "aleatórias" (ex.: "me dê o nome de 2 aeronaves
+	// aleatórias", "sorteia um avião") — só dispara quando a mensagem combina
+	// uma palavra de sorteio com uma palavra de aeronave, evitando falso
+	// positivo em perguntas tipo "número aleatório de passageiros".
+	const RANDOM_TRIGGER_WORDS = ['aleatorio', 'aleatoria', 'aleatorios', 'aleatorias', 'sorteia', 'sorteio', 'sortear', 'ao acaso', 'random'];
+	const AIRCRAFT_GENERIC_WORDS = ['aviao', 'avioes', 'aeronave', 'aeronaves', 'modelo', 'modelos', 'jato', 'jatos'];
+	function isRandomAircraftRequest(norm) {
+		const hasRandom = RANDOM_TRIGGER_WORDS.some((w) => hasWord(norm, w));
+		const hasAircraftWord = AIRCRAFT_GENERIC_WORDS.some((w) => hasWord(norm, w));
+		return hasRandom && hasAircraftWord;
+	}
+
+	const COUNT_WORDS = { um: 1, uma: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5, seis: 6 };
+	function extractCount(norm, fallback) {
+		const digitMatch = norm.match(/\d+/);
+		if (digitMatch) {
+			const n = parseInt(digitMatch[0], 10);
+			if (n > 0) return n;
+		}
+		const words = wordsOf(norm);
+		for (const w of words) {
+			if (COUNT_WORDS[w]) return COUNT_WORDS[w];
+		}
+		return fallback;
+	}
+
+	// Sorteia N aeronaves distintas entre as disponíveis no catálogo do site
+	// (window.AIRCRAFT_MODELS, a mesma base usada em Modelos e na Simulação).
+	function pickRandomAircraft(count) {
+		const models = window.AIRCRAFT_MODELS || [];
+		if (!models.length) return [];
+		const n = Math.max(1, Math.min(count, models.length, 6));
+		return shuffle(models).slice(0, n);
+	}
+
+	function describeRandomAircraft(list) {
+		const names = list.map((m) => bold(m.name));
+		const openers = [
+			'Rodei uma busca aqui no catálogo e essas foram as aeronaves sorteadas:',
+			'Dei uma vasculhada nos modelos do site e escolhi ao acaso:',
+			'Prontinho, sorteei aqui entre as aeronaves disponíveis:',
+			'Busquei entre os modelos cadastrados e essas foram as escolhidas:'
+		];
+		let joined;
+		if (names.length === 1) joined = names[0];
+		else if (names.length === 2) joined = `${names[0]} e ${names[1]}`;
+		else joined = `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
+		return `${pick('opener-random-aircraft', openers)} ${joined}. Quer saber mais detalhes sobre algum deles?`;
 	}
 
 	function findAircraft(norm) {
@@ -362,13 +640,20 @@
 	// ---------------------------------------------------------------------
 	// Geração de respostas (com variação de redação)
 	// ---------------------------------------------------------------------
+	// Marca o nome específico do conteúdo pedido (aeronave, fabricante,
+	// companhia, seção do site) para ser exibido em destaque (negrito) no chat.
+	function bold(text) {
+		return `**${text}**`;
+	}
+
 	function describeAircraft(model) {
 		const manuf = window.MANUFACTURER_INFO && window.MANUFACTURER_INFO[model.manufacturer];
+		const name = bold(model.name);
 		const openers = [
-			`O ${model.name} é um avião e tanto.`,
-			`Ah, o ${model.name}!`,
-			`Boa escolha perguntar sobre o ${model.name}.`,
-			`Falando do ${model.name}:`
+			`O ${name} é um avião e tanto.`,
+			`Ah, o ${name}!`,
+			`Boa escolha perguntar sobre o ${name}.`,
+			`Falando do ${name}:`
 		];
 		const facts = shuffle(model.descricao).slice(0, 2).join(' ');
 		const specTemplates = [
@@ -378,9 +663,10 @@
 		];
 		let manufLine = '';
 		if (manuf) {
+			const manufName = bold(model.manufacturer);
 			const manufTemplates = [
-				` É fabricado pela ${model.manufacturer}, sediada em ${manuf.hq} (${manuf.country}).`,
-				` Sai de fábrica da ${model.manufacturer}, com sede em ${manuf.hq}, ${manuf.country}.`
+				` É fabricado pela ${manufName}, sediada em ${manuf.hq} (${manuf.country}).`,
+				` Sai de fábrica da ${manufName}, com sede em ${manuf.hq}, ${manuf.country}.`
 			];
 			manufLine = pick('manuf-' + model.manufacturer, manufTemplates);
 		}
@@ -389,15 +675,16 @@
 
 	function describeManufacturer(manufacturer, models) {
 		const info = window.MANUFACTURER_INFO && window.MANUFACTURER_INFO[manufacturer];
-		const names = models.map((m) => m.name).join(', ');
+		const manufName = bold(manufacturer);
+		const names = models.map((m) => bold(m.name)).join(', ');
 		const openers = [
-			`A ${manufacturer}${info ? ' é uma fabricante ' + info.country : ''}.`,
-			`Sobre a ${manufacturer}:`,
-			`Deixa eu te falar da ${manufacturer}.`
+			`A ${manufName}${info ? ' é uma fabricante ' + info.country : ''}.`,
+			`Sobre a ${manufName}:`,
+			`Deixa eu te falar da ${manufName}.`
 		];
 		const listTemplates = [
 			`Temos ${models.length} modelo${models.length === 1 ? '' : 's'} dela aqui no site: ${names}.`,
-			`No nosso catálogo, a ${manufacturer} aparece com ${models.length} aeronave${models.length === 1 ? '' : 's'}: ${names}.`
+			`No nosso catálogo, a ${manufName} aparece com ${models.length} aeronave${models.length === 1 ? '' : 's'}: ${names}.`
 		];
 		return `${pick('opener-manuf', openers)} ${pick('list-' + manufacturer, listTemplates)} Quer que eu conte mais sobre algum modelo específico?`;
 	}
@@ -408,14 +695,15 @@
 			'Olha, no site você encontra aeronaves destas fabricantes:',
 			'As fabricantes que tenho no catálogo são:'
 		];
-		return `${pick('opener-manuf-list', openers)} ${names.join(', ')}. Sobre qual delas você quer saber mais?`;
+		return `${pick('opener-manuf-list', openers)} ${names.map(bold).join(', ')}. Sobre qual delas você quer saber mais?`;
 	}
 
 	function describeAirline(airline) {
+		const name = bold(airline.name);
 		const openers = [
-			`Sobre a ${airline.name}:`,
-			`Falando da ${airline.name},`,
-			`A ${airline.name} é uma das que temos por aqui.`
+			`Sobre a ${name}:`,
+			`Falando da ${name},`,
+			`A ${name} é uma das que temos por aqui.`
 		];
 		const tails = [
 			`Faz parte da ${airline.alliance}, com frota de cerca de ${airline.fleet} aeronaves, operando principalmente em ${airline.hubs.join(', ')}.`,
@@ -425,9 +713,10 @@
 	}
 
 	function describeFeature(feature) {
+		const label = bold(feature.label);
 		const openers = [
-			`Na página de ${feature.label},`,
-			`Aqui no site, na seção ${feature.label},`,
+			`Na página de ${label},`,
+			`Aqui no site, na seção ${label},`,
 			`Temos uma seção pra isso:`
 		];
 		return `${pick('opener-feature', openers)} ${feature.desc} Dá uma olhada em "${feature.label}" no menu lá em cima!`;
@@ -440,6 +729,25 @@
 		'Olá! Sobre o que você quer saber — aviões, aeroportos ou companhias aéreas?',
 		'E aí! Pronto para falar de aviação?',
 		'Oi, tudo bem? Pode perguntar sobre aviões que eu te ajudo.'
+	];
+	const WELLBEING_ANSWERS = [
+		'Tô voando liso, obrigado por perguntar! E você, tudo certo por aí?',
+		'Tudo em ordem por aqui, decolando bem! E você, como tá?',
+		'Bem demais, sistemas em dia e pronto pra ajudar! E você, tudo joia?',
+		'Tudo tranquilo na cabine por aqui! E contigo, tudo certo?',
+		'Voando alto e de boa! E você, como vai?'
+	];
+	const WELLBEING_HAPPY_FOR_USER = [
+		'Que ótimo saber disso! Fico feliz por você. 😊 Posso te ajudar com alguma dúvida sobre aviação?',
+		'Que bom! Fico contente em saber. Se quiser, é só perguntar sobre aviões, aeroportos ou companhias aéreas.',
+		'Maravilha, fico feliz mesmo! Bora falar de aviação então?',
+		'Show de bola! Fico feliz por você estar bem. Em que posso ajudar agora?'
+	];
+	const WELLBEING_COMFORT_FOR_USER = [
+		'Poxa, sinto muito ouvir isso. Espero que você melhore logo! Se quiser, posso tentar ajudar com algo sobre aviação para distrair um pouco.',
+		'Que pena, espero que fique tudo bem em breve. Estou por aqui se quiser conversar sobre aviões — às vezes ajuda a distrair.',
+		'Sinto muito por isso. Se precisar de uma pausa, posso te contar algo interessante sobre aviação enquanto isso.',
+		'Poxa vida, espero que melhore rápido. Qualquer coisa, estou aqui — inclusive para falar de aviação e distrair a mente.'
 	];
 	const THANKS = [
 		'De nada! Qualquer dúvida sobre aviação, é só chamar.',
@@ -461,7 +769,51 @@
 	const HELP_TEXT = 'Você pode me perguntar sobre modelos de aeronaves (tipo Boeing 737 ou Airbus A320), companhias aéreas (LATAM, GOL, Azul, Delta, American, TAP) ou sobre as páginas do site: Modelos, Aeroportos, Companhias, Simulação e Rastreio. Manda a pergunta!';
 
 	const OUT_OF_SCOPE_TEXT = 'Não tenho familiaridade com isso, meus conhecimentos são limitados a aviação.';
-	const NOT_YET_AVAILABLE_TEXT = 'Ainda não tenho conhecimento sobre isso, mas irei me informar para ajudar da próxima vez.';
+
+	// Usadas quando a mensagem claramente fala de aviação (bateu alguma
+	// AVIATION_KEYWORDS) mas não é um pedido específico o bastante para cair em
+	// aeronave/fabricante/companhia/seção do site — em vez de dizer "não sei",
+	// o Bob puxa assunto e convida o usuário a especificar.
+	const GENERIC_AVIATION_REPLIES = [
+		'Aviação é exatamente o meu assunto! Me conta um pouco mais: quer saber sobre um modelo de avião, uma companhia aérea ou alguma das ferramentas do site?',
+		'Esse é o tipo de papo que eu curto! Posso te ajudar com aeronaves, fabricantes, companhias aéreas ou as seções do site — é só me dar mais detalhes.',
+		'Boa, sou fã de aviação também! Se quiser, posso falar sobre um modelo específico, uma companhia aérea ou mostrar as ferramentas que temos por aqui.',
+		'Aviação é vida! Me diz mais sobre o que você quer saber que eu te ajudo — aeronaves, fabricantes, companhias ou as seções do site.',
+		'Legal! Manda mais detalhes que eu te ajudo — pode ser sobre um avião, uma companhia aérea ou qualquer seção do site.'
+	];
+
+	// Incentivo para quem diz que quer seguir uma carreira na aviação.
+	const ASPIRATION_TEMPLATES = [
+		'Que demais! Ser {role} é um sonho e tanto, e a aviação sempre precisa de gente apaixonada assim. Estude bastante, se informe e não desista — você vai longe!',
+		'Adorei saber disso! O caminho para virar {role} não é fácil, mas quem tem esse sonho de verdade chega lá. Continue se dedicando!',
+		'Show de bola! A aviação ganha muito com gente que sonha em ser {role}. Bora se preparar — e pode contar comigo pra tirar dúvidas sobre aviões, companhias e mais!',
+		'Incrível! Ser {role} é uma jornada linda. Persistência e estudo são a chave, e eu confio que você vai conseguir realizar esse sonho.'
+	];
+	function describeAspiration(role) {
+		const template = pick('aspiration-' + role, ASPIRATION_TEMPLATES);
+		return template.replace('{role}', bold(role));
+	}
+
+	// Perguntas de autoconfiança ("você acha que eu dou pra piloto?") — o Bob
+	// sempre acolhe e incentiva, com o papel específico em destaque quando
+	// identificado, ou de forma mais genérica quando não é.
+	const SELF_QUESTION_ROLE_TEMPLATES = [
+		'Com certeza! Quem se interessa por aviação do jeito que você faz já tem a atitude certa para ser um ótimo {role}. Continue estudando e sonhando alto!',
+		'Sem dúvida! Interesse e vontade de aprender são o começo de todo bom {role}. Eu aposto em você!',
+		'Óbvio que sim! O que faz um bom {role} é justamente essa curiosidade que você está mostrando agora. Continue assim!'
+	];
+	const SELF_QUESTION_GENERIC_TEMPLATES = [
+		'Com certeza que sim! Curiosidade e interesse por aviação já são um baita começo. Continue perguntando e aprendendo por aqui!',
+		'Não tenho dúvidas! Quem se interessa de verdade por aviação, como você, já está no caminho certo.',
+		'Óbvio que sim! Esse seu interesse por aviação já diz muito. Bora continuar aprendendo juntos?'
+	];
+	function describeSelfQuestion(role) {
+		if (role) {
+			const template = pick('self-question-' + role, SELF_QUESTION_ROLE_TEMPLATES);
+			return template.replace('{role}', bold(role));
+		}
+		return pick('self-question-generic', SELF_QUESTION_GENERIC_TEMPLATES);
+	}
 
 	const AFFIRM_GENERIC_REPLIES = [
 		'Boa! Me conta então: quer saber sobre um modelo de avião, uma companhia aérea ou alguma das ferramentas do site?',
@@ -474,6 +826,61 @@
 		'Combinado. Qualquer outra coisa sobre aviação, é só chamar.'
 	];
 
+	// ---------------------------------------------------------------------
+	// Tradução da resposta (DeepL) — o Bob sempre RACIOCINA em português
+	// (getBobReply abaixo), mas se a pergunta do usuário veio em inglês, a
+	// resposta final é traduzida antes de aparecer no chat. Depende de
+	// DEEPL_API_KEY configurada no servidor (.env) e do site estar sendo
+	// servido via server.js — sem a chave, /api/translate responde com erro
+	// e o Bob simplesmente mostra a resposta em português (ver
+	// translateToEnglish abaixo).
+	// ---------------------------------------------------------------------
+	// Palavras exclusivas de português: se qualquer uma aparecer, a mensagem
+	// não é tratada como inglês mesmo que também contenha termos em inglês
+	// (evita traduzir mensagens mistas ou majoritariamente em português).
+	const PORTUGUESE_ONLY_MARKERS = new Set([
+		'voce', 'vc', 'nao', 'sim', 'que', 'isso', 'essa', 'esse', 'para', 'como', 'muito', 'tambem',
+		'esta', 'sao', 'uma', 'obrigado', 'obrigada', 'valeu', 'oi', 'ola', 'aviao', 'avioes',
+		'aeroporto', 'aeronave', 'qual', 'quais', 'onde', 'quando', 'porque', 'com', 'sem', 'voo'
+	]);
+	// Palavras funcionais do inglês que não têm ambiguidade com português —
+	// usadas junto com as chaves de ENGLISH_TERMS para detectar o idioma.
+	const ENGLISH_FUNCTION_WORDS = new Set([
+		'the', 'is', 'are', 'am', 'you', 'your', 'what', 'who', 'when', 'where', 'why', 'how',
+		'want', 'wanted', 'wish', 'dream', 'become', 'yes', 'no', 'thanks', 'thank', 'bye',
+		'goodbye', 'hello', 'hi', 'hey', 'please', 'and', 'with', 'do', 'does', 'did', 'can',
+		'could', 'would', 'will', 'tell', 'me', 'about', 'good', 'great', 'help', 'not', 'sure', 'okay'
+	]);
+
+	// Roda sobre o texto ORIGINAL do usuário, antes de normalize() traduzir os
+	// termos de aviação para português — depois disso o sinal "isso veio em
+	// inglês" já teria se perdido.
+	function isEnglishInput(raw) {
+		const text = String(raw || '');
+		if (/[áàâãéèêíìóòôõúùçñÁÀÂÃÉÈÊÍÌÓÒÔÕÚÙÇÑ]/.test(text)) return false;
+
+		const tokens = text.toLowerCase().match(/[a-z]+/g) || [];
+		if (!tokens.length) return false;
+		if (tokens.some((t) => PORTUGUESE_ONLY_MARKERS.has(t))) return false;
+
+		return tokens.some((t) => ENGLISH_TERMS[t] || ENGLISH_FUNCTION_WORDS.has(t));
+	}
+
+	async function translateToEnglish(text) {
+		try {
+			const response = await fetch('/api/translate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text, target_lang: 'EN-US' })
+			});
+			if (!response.ok) return text;
+			const data = await response.json();
+			return data && data.translated ? data.translated : text;
+		} catch (e) {
+			return text;
+		}
+	}
+
 	// prevContext guarda o que o Bob acabou de perguntar (ex.: "quer saber mais
 	// sobre algum modelo específico?"), para interpretar respostas curtas como
 	// "sim"/"não" no contexto da própria pergunta em vez de tratá-las isoladas.
@@ -481,12 +888,25 @@
 		const norm = normalize(raw);
 		if (!norm) return { text: 'Pode repetir? Não entendi muito bem.', context: prevContext || null };
 
+		// O Bob acabou de perguntar "e você, tudo certo?" — antes de qualquer
+		// outra coisa, vê se essa mensagem é a resposta disso.
+		if (prevContext && prevContext.awaiting === 'user-wellbeing') {
+			if (isWellbeingReplyNegative(norm)) return { text: pick('wellbeing-comfort', WELLBEING_COMFORT_FOR_USER), context: null };
+			if (isWellbeingReplyPositive(norm)) return { text: pick('wellbeing-happy', WELLBEING_HAPPY_FOR_USER), context: null };
+		}
+
 		if (isEasterEgg(norm)) return { text: EASTER_EGG_TEXT, song: true, context: null };
 		if (isGreeting(norm)) return { text: pick('greeting', GREETINGS), context: null };
+		if (isWellbeingQuestion(norm)) return { text: pick('wellbeing', WELLBEING_ANSWERS), context: { awaiting: 'user-wellbeing' } };
 		if (isThanks(norm)) return { text: pick('thanks', THANKS), context: null };
 		if (isFarewell(norm)) return { text: pick('bye', BYES), context: null };
 		if (isAboutBob(norm)) return { text: pick('about', ABOUTS), context: null };
 		if (isHelp(norm)) return { text: HELP_TEXT, context: null };
+
+		if (isRandomAircraftRequest(norm)) {
+			const list = pickRandomAircraft(extractCount(norm, 2));
+			if (list.length) return { text: describeRandomAircraft(list), context: { awaiting: 'model-pick', models: list } };
+		}
 
 		const aircraft = findAircraft(norm);
 		if (aircraft) return { text: describeAircraft(aircraft), context: null };
@@ -502,6 +922,11 @@
 
 		const feature = findFeature(norm);
 		if (feature) return { text: describeFeature(feature), context: null };
+
+		const aspirationRole = findAspirationRole(norm);
+		if (aspirationRole) return { text: describeAspiration(aspirationRole), context: null };
+
+		if (isSelfQuestion(norm)) return { text: describeSelfQuestion(findAviationRole(norm)), context: null };
 
 		if (hasWord(norm, 'fabricante') || hasWord(norm, 'fabricantes')) {
 			const names = listManufacturers();
@@ -527,7 +952,7 @@
 		}
 
 		const hasAviationKeyword = AVIATION_KEYWORDS.some((k) => hasWord(norm, k));
-		if (hasAviationKeyword) return { text: NOT_YET_AVAILABLE_TEXT, context: null };
+		if (hasAviationKeyword) return { text: pick('generic-aviation', GENERIC_AVIATION_REPLIES), context: null };
 
 		return { text: OUT_OF_SCOPE_TEXT, context: null };
 	}
@@ -643,6 +1068,21 @@
 		while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
 	}
 
+	// Escapa HTML antes de converter marcações **negrito** em <strong>, usado
+	// só nas respostas do bot (texto do usuário sempre vai como textContent puro).
+	function escapeHtml(str) {
+		return String(str)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+	}
+
+	function renderRichText(text) {
+		return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+	}
+
 	function createMessageElement(role, text, options) {
 		options = options || {};
 		const li = document.createElement('li');
@@ -660,7 +1100,11 @@
 		bubble.className = role === 'user'
 			? 'max-w-[78%] rounded-2xl rounded-br-sm bg-slate-200 px-3.5 py-2.5 text-sm leading-relaxed text-[#18283b] shadow-sm'
 			: 'max-w-[78%] rounded-2xl rounded-bl-sm bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-sm' + (options.song ? ' italic' : '');
-		bubble.textContent = text;
+		if (role === 'bot') {
+			bubble.innerHTML = renderRichText(text);
+		} else {
+			bubble.textContent = text;
+		}
 		li.appendChild(bubble);
 
 		if (role === 'user') {
@@ -771,11 +1215,14 @@
 			scrollToBottom();
 
 			const delay = 1000 + Math.random() * 500;
-			setTimeout(() => {
-				typingEl.remove();
+			setTimeout(async () => {
 				const reply = getBobReply(text, state.context);
 				state.context = reply.context || null;
-				addAndStore('bot', reply.text, { song: !!reply.song });
+				// Mantém o indicador de "digitando" durante a tradução (quando aplicável),
+				// já que ela depende de uma chamada de rede ao /api/translate.
+				const replyText = isEnglishInput(text) ? await translateToEnglish(reply.text) : reply.text;
+				typingEl.remove();
+				addAndStore('bot', replyText, { song: !!reply.song });
 				isBotTyping = false;
 				input.disabled = false;
 				sendBtn.disabled = false;
