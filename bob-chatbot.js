@@ -160,10 +160,71 @@
 			.trim();
 	}
 
+	// Distância de Levenshtein simples, usada para tolerar erros de digitação
+	// (troca, falta ou sobra de uma letra) ao reconhecer palavras-chave.
+	function levenshtein(a, b) {
+		const al = a.length;
+		const bl = b.length;
+		if (al === 0) return bl;
+		if (bl === 0) return al;
+		const dp = new Array(bl + 1);
+		for (let j = 0; j <= bl; j += 1) dp[j] = j;
+		for (let i = 1; i <= al; i += 1) {
+			let prev = dp[0];
+			dp[0] = i;
+			for (let j = 1; j <= bl; j += 1) {
+				const tmp = dp[j];
+				dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+				prev = tmp;
+			}
+		}
+		return dp[bl];
+	}
+
+	function wordsOf(norm) {
+		return norm.split(' ').filter(Boolean);
+	}
+
+	// Quanto maior a palavra, mais margem de erro de digitação é tolerada.
+	// Palavras curtas (<=3 letras) exigem correspondência exata para não gerar
+	// falsos positivos (ex.: "voo" x "vou").
+	function fuzzyTolerance(len) {
+		if (len <= 3) return 0;
+		if (len <= 6) return 1;
+		return 2;
+	}
+
 	function hasWord(norm, phrase) {
 		const p = normalize(phrase);
 		if (!p) return false;
-		return (' ' + norm + ' ').indexOf(' ' + p + ' ') !== -1;
+		if ((' ' + norm + ' ').indexOf(' ' + p + ' ') !== -1) return true;
+
+		const pWords = p.split(' ');
+		const nWords = wordsOf(norm);
+
+		if (pWords.length === 1) {
+			const tol = fuzzyTolerance(pWords[0].length);
+			if (tol === 0) return false;
+			return nWords.some((w) => Math.abs(w.length - pWords[0].length) <= tol && levenshtein(w, pWords[0]) <= tol);
+		}
+
+		// Frase com várias palavras: procura uma janela de tokens consecutivos
+		// em que cada palavra bate (exata ou com pequena tolerância).
+		for (let start = 0; start <= nWords.length - pWords.length; start += 1) {
+			let ok = true;
+			for (let i = 0; i < pWords.length; i += 1) {
+				const nw = nWords[start + i];
+				const pw = pWords[i];
+				if (nw === pw) continue;
+				const tol = fuzzyTolerance(pw.length);
+				if (tol === 0 || Math.abs(nw.length - pw.length) > tol || levenshtein(nw, pw) > tol) {
+					ok = false;
+					break;
+				}
+			}
+			if (ok) return true;
+		}
+		return false;
 	}
 
 	function shuffle(arr) {
@@ -197,9 +258,16 @@
 			norm.indexOf('grandao') !== -1;
 	}
 
-	const GREETING_WORDS = ['oi', 'ola', 'opa', 'eae', 'e ai', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello', 'salve'];
+	// Frases de saudação específicas o bastante para valer em qualquer mensagem.
+	const GREETING_PHRASES = ['bom dia', 'boa tarde', 'boa noite', 'fala ae bob', 'fala bob', 'eae bob', 'e ai bob'];
+	// Palavras soltas comuns demais (podem aparecer dentro de perguntas reais,
+	// tipo "me fala mais sobre..." ou "bob, qual o alcance..."), então só contam
+	// como saudação quando a mensagem inteira é curta.
+	const GREETING_SHORT_WORDS = ['oi', 'ola', 'opa', 'eae', 'e ai', 'hey', 'hello', 'salve', 'bob', 'fala', 'falae', 'fala ae'];
 	function isGreeting(norm) {
-		return GREETING_WORDS.some((w) => hasWord(norm, w));
+		if (GREETING_PHRASES.some((w) => hasWord(norm, w))) return true;
+		if (wordsOf(norm).length > 3) return false;
+		return GREETING_SHORT_WORDS.some((w) => hasWord(norm, w));
 	}
 
 	const THANKS_WORDS = ['obrigado', 'obrigada', 'valeu', 'vlw', 'thanks', 'brigado', 'brigada'];
@@ -210,6 +278,16 @@
 	const FAREWELL_WORDS = ['tchau', 'ate mais', 'ate logo', 'falou', 'flw', 'adeus', 'ate a proxima'];
 	function isFarewell(norm) {
 		return FAREWELL_WORDS.some((w) => hasWord(norm, w));
+	}
+
+	const AFFIRM_WORDS = ['sim', 'com certeza', 'claro', 'quero sim', 'pode ser', 'bora', 'uhum', 'aham', 'exatamente', 'positivo', 'afirmativo'];
+	function isAffirmative(norm) {
+		return AFFIRM_WORDS.some((w) => hasWord(norm, w));
+	}
+
+	const NEGATIVE_WORDS = ['nao', 'negativo', 'nunca', 'deixa pra la', 'agora nao'];
+	function isNegative(norm) {
+		return NEGATIVE_WORDS.some((w) => hasWord(norm, w));
 	}
 
 	function isAboutBob(norm) {
@@ -251,6 +329,15 @@
 			}
 		}
 		return null;
+	}
+
+	function listManufacturers() {
+		const models = window.AIRCRAFT_MODELS || [];
+		const seen = [];
+		models.forEach((m) => {
+			if (seen.indexOf(m.manufacturer) === -1) seen.push(m.manufacturer);
+		});
+		return seen;
 	}
 
 	function findAirline(norm) {
@@ -315,6 +402,15 @@
 		return `${pick('opener-manuf', openers)} ${pick('list-' + manufacturer, listTemplates)} Quer que eu conte mais sobre algum modelo específico?`;
 	}
 
+	function describeManufacturersList(names) {
+		const openers = [
+			'Temos aeronaves de várias fabricantes por aqui:',
+			'Olha, no site você encontra aeronaves destas fabricantes:',
+			'As fabricantes que tenho no catálogo são:'
+		];
+		return `${pick('opener-manuf-list', openers)} ${names.join(', ')}. Sobre qual delas você quer saber mais?`;
+	}
+
 	function describeAirline(airline) {
 		const openers = [
 			`Sobre a ${airline.name}:`,
@@ -367,33 +463,73 @@
 	const OUT_OF_SCOPE_TEXT = 'Não tenho familiaridade com isso, meus conhecimentos são limitados a aviação.';
 	const NOT_YET_AVAILABLE_TEXT = 'Ainda não tenho conhecimento sobre isso, mas irei me informar para ajudar da próxima vez.';
 
-	function getBobReply(raw) {
-		const norm = normalize(raw);
-		if (!norm) return { text: 'Pode repetir? Não entendi muito bem.' };
+	const AFFIRM_GENERIC_REPLIES = [
+		'Boa! Me conta então: quer saber sobre um modelo de avião, uma companhia aérea ou alguma das ferramentas do site?',
+		'Show! Sobre o que especificamente? Pode ser um avião, uma companhia aérea ou uma das seções do site.',
+		'Beleza! Só me diz o assunto — avião, companhia aérea ou funcionalidade do site — que eu te ajudo.'
+	];
+	const DECLINE_REPLIES = [
+		'Tudo bem! Se quiser saber de outra coisa, é só perguntar.',
+		'Sem problemas! Fico à disposição se tiver outra dúvida.',
+		'Combinado. Qualquer outra coisa sobre aviação, é só chamar.'
+	];
 
-		if (isEasterEgg(norm)) return { text: EASTER_EGG_TEXT, song: true };
-		if (isGreeting(norm)) return { text: pick('greeting', GREETINGS) };
-		if (isThanks(norm)) return { text: pick('thanks', THANKS) };
-		if (isFarewell(norm)) return { text: pick('bye', BYES) };
-		if (isAboutBob(norm)) return { text: pick('about', ABOUTS) };
-		if (isHelp(norm)) return { text: HELP_TEXT };
+	// prevContext guarda o que o Bob acabou de perguntar (ex.: "quer saber mais
+	// sobre algum modelo específico?"), para interpretar respostas curtas como
+	// "sim"/"não" no contexto da própria pergunta em vez de tratá-las isoladas.
+	function getBobReply(raw, prevContext) {
+		const norm = normalize(raw);
+		if (!norm) return { text: 'Pode repetir? Não entendi muito bem.', context: prevContext || null };
+
+		if (isEasterEgg(norm)) return { text: EASTER_EGG_TEXT, song: true, context: null };
+		if (isGreeting(norm)) return { text: pick('greeting', GREETINGS), context: null };
+		if (isThanks(norm)) return { text: pick('thanks', THANKS), context: null };
+		if (isFarewell(norm)) return { text: pick('bye', BYES), context: null };
+		if (isAboutBob(norm)) return { text: pick('about', ABOUTS), context: null };
+		if (isHelp(norm)) return { text: HELP_TEXT, context: null };
 
 		const aircraft = findAircraft(norm);
-		if (aircraft) return { text: describeAircraft(aircraft) };
+		if (aircraft) return { text: describeAircraft(aircraft), context: null };
 
 		const manufacturer = findManufacturer(norm);
-		if (manufacturer && manufacturer.models.length) return { text: describeManufacturer(manufacturer.manufacturer, manufacturer.models) };
+		if (manufacturer && manufacturer.models.length) {
+			const models = manufacturer.models;
+			return { text: describeManufacturer(manufacturer.manufacturer, models), context: { awaiting: 'model-pick', models } };
+		}
 
 		const airline = findAirline(norm);
-		if (airline) return { text: describeAirline(airline) };
+		if (airline) return { text: describeAirline(airline), context: null };
 
 		const feature = findFeature(norm);
-		if (feature) return { text: describeFeature(feature) };
+		if (feature) return { text: describeFeature(feature), context: null };
+
+		if (hasWord(norm, 'fabricante') || hasWord(norm, 'fabricantes')) {
+			const names = listManufacturers();
+			if (names.length) return { text: describeManufacturersList(names), context: { awaiting: 'manufacturer-pick', manufacturers: names } };
+		}
+
+		if (isAffirmative(norm)) {
+			if (prevContext && prevContext.awaiting === 'model-pick' && prevContext.models && prevContext.models.length) {
+				const models = prevContext.models;
+				if (models.length === 1) return { text: describeAircraft(models[0]), context: null };
+				const names = models.map((m) => m.name).join(', ');
+				return { text: `Claro! Temos: ${names}. Qual deles você quer conhecer melhor?`, context: { awaiting: 'model-pick', models } };
+			}
+			if (prevContext && prevContext.awaiting === 'manufacturer-pick' && prevContext.manufacturers && prevContext.manufacturers.length) {
+				const names = prevContext.manufacturers;
+				return { text: `Show! São essas: ${names.join(', ')}. Qual delas te interessa?`, context: { awaiting: 'manufacturer-pick', manufacturers: names } };
+			}
+			return { text: pick('affirm-generic', AFFIRM_GENERIC_REPLIES), context: null };
+		}
+
+		if (isNegative(norm)) {
+			return { text: pick('decline-generic', DECLINE_REPLIES), context: null };
+		}
 
 		const hasAviationKeyword = AVIATION_KEYWORDS.some((k) => hasWord(norm, k));
-		if (hasAviationKeyword) return { text: NOT_YET_AVAILABLE_TEXT };
+		if (hasAviationKeyword) return { text: NOT_YET_AVAILABLE_TEXT, context: null };
 
-		return { text: OUT_OF_SCOPE_TEXT };
+		return { text: OUT_OF_SCOPE_TEXT, context: null };
 	}
 
 	// ---------------------------------------------------------------------
@@ -410,9 +546,9 @@
 	function loadState() {
 		try {
 			const raw = sessionStorage.getItem(STORAGE_KEY);
-			return raw ? JSON.parse(raw) : { open: false, messages: [] };
+			return raw ? JSON.parse(raw) : { open: false, messages: [], context: null };
 		} catch (e) {
-			return { open: false, messages: [] };
+			return { open: false, messages: [], context: null };
 		}
 	}
 
@@ -422,6 +558,24 @@
 		} catch (e) {
 			/* sessionStorage indisponível (modo privado, etc.) — segue sem persistir */
 		}
+	}
+
+	// Distingue um F5/recarregar (reseta a conversa) de uma navegação normal
+	// entre páginas do site (mantém a conversa, já que cada página é um load
+	// separado do mesmo jeito).
+	function isReloadNavigation() {
+		try {
+			const entries = performance.getEntriesByType('navigation');
+			if (entries && entries.length && entries[0].type) return entries[0].type === 'reload';
+		} catch (e) {
+			/* ignora e tenta a API antiga */
+		}
+		try {
+			if (performance.navigation) return performance.navigation.type === 1;
+		} catch (e) {
+			/* API de navegação indisponível */
+		}
+		return false;
 	}
 
 	function injectMarkup() {
@@ -434,8 +588,15 @@
 			.bob-dot:nth-child(3) { animation-delay: .3s; }
 			#bob-chat-body::-webkit-scrollbar { width: 6px; }
 			#bob-chat-body::-webkit-scrollbar-thumb { background: rgba(16,45,85,.18); border-radius: 999px; }
-			@media (max-width: 420px) {
-				#bob-chat-panel { right: 12px !important; left: 12px !important; width: auto !important; }
+			@media (max-width: 640px) {
+				#bob-toggle-btn { right: 20px !important; bottom: 20px !important; }
+				#bob-chat-panel {
+					right: 12px !important;
+					left: 12px !important;
+					bottom: 96px !important;
+					width: auto !important;
+					height: min(560px, calc(100vh - 140px)) !important;
+				}
 			}
 		`;
 		document.head.appendChild(style);
@@ -449,7 +610,7 @@
 			</button>
 
 			<div id="bob-chat-panel" role="dialog" aria-modal="false" aria-label="Chat de suporte com Bob o Avião" hidden
-				class="fixed bottom-[155px] right-[70px] z-[999] h-[min(560px,calc(100vh-140px))] w-[min(380px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_24px_60px_rgba(16,45,85,0.35)] ring-1 ring-slate-900/5">
+				class="fixed bottom-[155px] right-[70px] z-[999] h-[min(560px,calc(100vh-195px))] w-[min(380px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_24px_60px_rgba(16,45,85,0.35)] ring-1 ring-slate-900/5">
 				<header class="flex shrink-0 items-center gap-3 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] px-4 py-3">
 					<img src="./images/BobPerfil.webp" alt="" class="h-10 w-10 shrink-0 rounded-full object-cover object-[50%_22%] ring-2 ring-white/70">
 					<div class="min-w-0 flex-1">
@@ -540,6 +701,9 @@
 		const input = document.getElementById('bob-chat-input');
 		const sendBtn = document.getElementById('bob-send-btn');
 
+		if (isReloadNavigation()) {
+			try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignora */ }
+		}
 		const state = loadState();
 
 		function scrollToBottom() {
@@ -606,10 +770,11 @@
 			messagesEl.appendChild(typingEl);
 			scrollToBottom();
 
-			const delay = 500 + Math.random() * 700;
+			const delay = 1000 + Math.random() * 500;
 			setTimeout(() => {
 				typingEl.remove();
-				const reply = getBobReply(text);
+				const reply = getBobReply(text, state.context);
+				state.context = reply.context || null;
 				addAndStore('bot', reply.text, { song: !!reply.song });
 				isBotTyping = false;
 				input.disabled = false;
