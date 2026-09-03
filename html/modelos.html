@@ -3,9 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<link rel="icon" href="../images/LogoAviatorInfo.ico" type="image/x-icon">
 	<title>Modelos | Aviator Info</title>
-	<link rel="stylesheet" href="./dist/tailwind.css">
+	<link rel="stylesheet" href="../dist/tailwind.css">
 	<style>
 		h3.group {
 			position: relative;
@@ -367,12 +367,10 @@
 	</style>
 </head>
 	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
-	<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
-		<div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
-			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./index.html" aria-label="Ir para a página principal">
-				<img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="./images/AviatorLogo.png" alt="Aviator Info">
-			</a>
-			<nav class="hidden items-center gap-0.5 sm:flex sm:gap-2" aria-label="Links principais">
+	<header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
+		<div class="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
+			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="../index.html" aria-label="Ir para a página principal"><img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="../images/LogoAviatorInfo.png" alt="Aviator Info"></a>
+			<nav class="no-scrollbar flex items-center gap-0.5 overflow-x-auto sm:gap-2">
 				<a class="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-2 text-[13px] font-semibold text-[#1a56c4] shadow-sm sm:px-5 sm:text-base" href="./modelos.html" aria-current="page">Modelos</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./aeroportos.html">Aeroportos</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./companhias.html">Companhias</a>
@@ -380,19 +378,7 @@
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./comparar.html">Comparar</a>
 			</nav>
-			<button type="button" id="nav-toggle" class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:hidden" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menu">
-				<svg id="nav-icon-open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
-				<svg id="nav-icon-close" class="hidden h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
-			</button>
 		</div>
-		<nav id="mobile-nav" class="hidden w-full flex-col gap-1 border-t border-white/10 bg-[#173f91] px-3 pb-3 pt-2 sm:hidden" aria-label="Links principais (menu móvel)">
-				<a class="block rounded-lg bg-white px-4 py-3 text-base font-semibold text-[#1a56c4] shadow-sm" href="./modelos.html" aria-current="page">Modelos</a>
-				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./aeroportos.html">Aeroportos</a>
-				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./companhias.html">Companhias</a>
-				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./simulacao.html">Simulação</a>
-				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./rastreio.html">Rastreio</a>
-				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./comparar.html">Comparar</a>
-		</nav>
 	</header>
 	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
 		<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Modelos</h1>
@@ -408,8 +394,7 @@
 			<div id="models-container"></div>
 		</section>
 	</main>
-	<script src="./header-nav.js"></script>
-	<script src="./aircraft-data.js"></script>
+	<script src="../js/aircraft-data.js"></script>
 	<script>
 		const modelsContainer = document.getElementById('models-container');
 		const models = Array.isArray(window.AIRCRAFT_MODELS) ? window.AIRCRAFT_MODELS : [];
@@ -517,15 +502,15 @@
 
 			const plane = document.createElement('img');
 			plane.className = 'plane-icon';
-			plane.src = './images/AviaoSVG.svg';
+			plane.src = '../images/AviaoSVG.svg';
 			plane.alt = '';
 			plane.setAttribute('aria-hidden', 'true');
 			heading.appendChild(plane);
 
 			const grid = document.createElement('div');
-			grid.className = 'aircraft-grid mt-0 rounded-b-[12px] bg-[#edf3fb] grid items-start gap-5 md:grid-cols-3 mb-8';
+			grid.className = 'aircraft-grid mt-0 mb-8 w-full rounded-b-[12px] bg-[#edf3fb]';
 			const track = document.createElement('div');
-			track.className = 'aircraft-track flex items-start gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-3 md:gap-6';
+			track.className = 'aircraft-track flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3';
 			track.style.gridColumn = '1 / -1';
 			grid.appendChild(track);
 
@@ -572,26 +557,26 @@
 
 			models.filter((model) => model.manufacturer === manufacturer).forEach((aircraft) => {
 				const card = document.createElement('article');
-				card.className = 'group aircraft-card overflow-hidden rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]';
-				card.style.minWidth = 'calc((100% - 2.5rem) / 3)';
-				card.style.maxWidth = 'calc((100% - 2.5rem) / 3)';
-				card.style.flex = '0 0 calc((100% - 2.5rem) / 3)';
-				card.style.scrollSnapAlign = 'start';
+				card.className = 'group aircraft-card snap-center shrink-0 w-[85vw] max-w-[320px] overflow-hidden break-words rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)] md:w-full md:max-w-none md:shrink';
+				card.style.minWidth = '0';
+				card.style.maxWidth = '320px';
+				card.style.flex = '0 0 auto';
+				card.style.scrollSnapAlign = 'center';
 
 				const img = document.createElement('img');
 				img.src = aircraft.image;
 				img.alt = aircraft.alt || aircraft.name;
 				img.loading = 'lazy';
-				img.className = 'h-44 w-full object-cover transition duration-300 group-hover:scale-105';
+				img.className = 'h-36 w-full object-cover transition duration-300 group-hover:scale-105 sm:h-40';
 				card.appendChild(img);
 
 				const title = document.createElement('span');
-				title.className = 'aircraft-title block px-5 pb-2 pt-4 text-center text-lg font-extrabold leading-tight text-slate-900';
+				title.className = 'aircraft-title block w-full max-w-full p-4 text-center text-base font-extrabold leading-tight text-slate-900 break-words sm:p-6 sm:text-lg';
 				title.textContent = aircraft.name;
 				card.appendChild(title);
 
 				const specBlock = document.createElement('div');
-				specBlock.className = 'px-5 pb-2';
+				specBlock.className = 'w-full max-w-full p-4 break-words sm:p-6';
 				specBlock.innerHTML = `
 					<div class="overflow-hidden rounded-lg border border-slate-300 bg-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
 						<div class="grid grid-cols-2 border-b border-slate-300 bg-slate-200 text-[0.56rem] font-bold uppercase tracking-[0.08em] text-slate-700">
@@ -651,6 +636,6 @@
 			});
 		});
 	</script>
-	<script src="./bob-chatbot.js"></script>
+	<script src="../js/bob-chatbot.js"></script>
 </body>
 </html>

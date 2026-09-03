@@ -1030,14 +1030,14 @@
 		wrap.innerHTML = `
 			<button id="bob-toggle-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="bob-chat-panel" aria-label="Abrir chat com Bob o Avião"
 				class="fixed bottom-[79px] right-[70px] z-[998] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(16,45,85,0.35)] ring-4 ring-white transition duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300">
-				<img src="./images/BobPerfil.webp" alt="" class="h-full w-full rounded-full object-cover object-[50%_22%]">
+				<img src="/images/BobPerfil.webp" alt="" class="h-full w-full rounded-full object-cover object-[50%_22%]">
 				<span class="absolute right-0.5 top-0.5 h-4 w-4 rounded-full border-2 border-white bg-emerald-400" aria-hidden="true"></span>
 			</button>
 
 			<div id="bob-chat-panel" role="dialog" aria-modal="false" aria-label="Chat de suporte com Bob o Avião" hidden
 				class="fixed bottom-[155px] right-[70px] z-[999] h-[min(560px,calc(100vh-195px))] w-[min(380px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_24px_60px_rgba(16,45,85,0.35)] ring-1 ring-slate-900/5">
 				<header class="flex shrink-0 items-center gap-3 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] px-4 py-3">
-					<img src="./images/BobPerfil.webp" alt="" class="h-10 w-10 shrink-0 rounded-full object-cover object-[50%_22%] ring-2 ring-white/70">
+					<img src="/images/BobPerfil.webp" alt="" class="h-10 w-10 shrink-0 rounded-full object-cover object-[50%_22%] ring-2 ring-white/70">
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-sm font-bold text-white">Bob o Avião</p>
 						<p class="flex items-center gap-1.5 text-xs font-medium text-sky-100"><span class="h-2 w-2 rounded-full bg-emerald-400"></span>Online</p>
@@ -1048,7 +1048,7 @@
 
 				<div id="bob-chat-body" class="flex-1 overflow-y-auto bg-slate-50 px-4 py-4">
 					<div id="bob-empty-state" class="flex h-full flex-col items-center justify-center gap-3 text-center">
-						<img src="./images/BobApresentando.webp" alt="Bob o Avião apresentando o chat" class="h-40 w-40 object-contain">
+						<img src="/images/BobApresentando.webp" alt="Bob o Avião apresentando o chat" class="h-40 w-40 object-contain">
 						<p class="max-w-[240px] text-sm leading-relaxed text-[#18283b]">Oi! Eu sou o Bob. Pergunte sobre aviões, aeroportos ou companhias aéreas.</p>
 					</div>
 					<ul id="bob-messages" class="flex flex-col gap-3"></ul>
@@ -1090,7 +1090,7 @@
 
 		if (role === 'bot') {
 			const avatar = document.createElement('img');
-			avatar.src = './images/BobPerfil.webp';
+			avatar.src = '/images/BobPerfil.webp';
 			avatar.alt = '';
 			avatar.className = 'h-7 w-7 shrink-0 rounded-full object-cover object-[50%_22%]';
 			li.appendChild(avatar);
@@ -1122,7 +1122,7 @@
 		li.id = 'bob-typing';
 		li.className = 'flex items-end gap-2';
 		li.innerHTML = `
-			<img src="./images/BobPerfil.webp" alt="" class="h-7 w-7 shrink-0 rounded-full object-cover object-[50%_22%]">
+			<img src="/images/BobPerfil.webp" alt="" class="h-7 w-7 shrink-0 rounded-full object-cover object-[50%_22%]">
 			<div class="flex items-center gap-1 rounded-2xl rounded-bl-sm bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] px-3.5 py-3 shadow-sm">
 				<span class="bob-dot h-1.5 w-1.5 rounded-full bg-white/90"></span>
 				<span class="bob-dot h-1.5 w-1.5 rounded-full bg-white/90"></span>
