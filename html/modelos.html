@@ -3,9 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<link rel="icon" href="./images/AviatorIcon.ico" type="image/x-icon">
+	<link rel="icon" href="../images/AviatorIcon.ico" type="image/x-icon">
 	<title>Modelos | Aviator Info</title>
-	<link rel="stylesheet" href="./dist/tailwind.css">
+	<link rel="stylesheet" href="../dist/tailwind.css">
 	<style>
 		h3.group {
 			position: relative;
@@ -128,6 +128,28 @@
 			left: calc(100% - 3.4rem);
 			opacity: 1;
 			transform: translateY(-50%) rotate(4deg) scale(1);
+		}
+		h3.group .mfr-logo {
+			position: absolute;
+			top: 50%;
+			right: 1.35rem;
+			width: 2.5rem;
+			height: 2.5rem;
+			padding: 0.3rem;
+			border-radius: 8px;
+			background: #ffffff;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			object-fit: contain;
+			transform: translateY(-50%) scale(1);
+			opacity: 1;
+			z-index: 2;
+			pointer-events: none;
+			transition: opacity 380ms ease 850ms, transform 380ms ease 850ms;
+		}
+		h3.group.expanded .mfr-logo {
+			opacity: 0;
+			transform: translateY(-50%) translateX(18px) scale(0.55);
+			transition: opacity 320ms ease, transform 380ms ease;
 		}
 		h3.group::before {
 			content: "";
@@ -369,8 +391,8 @@
 	<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
 	<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
 		<div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
-			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./index.html" aria-label="Ir para a página principal">
-				<img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="./images/AviatorLogo.png" alt="Aviator Info">
+			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="../index.html" aria-label="Ir para a página principal">
+				<img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="../images/AviatorLogo.png" alt="Aviator Info">
 			</a>
 			<nav class="hidden items-center gap-0.5 sm:flex sm:gap-2" aria-label="Links principais">
 				<a class="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-2 text-[13px] font-semibold text-[#1a56c4] shadow-sm sm:px-5 sm:text-base" href="./modelos.html" aria-current="page">Modelos</a>
@@ -408,8 +430,8 @@
 			<div id="models-container"></div>
 		</section>
 	</main>
-	<script src="./header-nav.js"></script>
-	<script src="./aircraft-data.js"></script>
+	<script src="../js/header-nav.js"></script>
+	<script src="../js/aircraft-data.js"></script>
 	<script>
 		const modelsContainer = document.getElementById('models-container');
 		const models = Array.isArray(window.AIRCRAFT_MODELS) ? window.AIRCRAFT_MODELS : [];
@@ -421,6 +443,55 @@
 
 		const MANUFACTURER_INFO = window.MANUFACTURER_INFO || {};
 		const countryFilterContainer = document.getElementById('country-filter');
+
+		const modelPopup = document.createElement('div');
+		modelPopup.style.cssText = 'position:fixed;z-index:9999;display:none;overflow:hidden;border-radius:10px;background:#0f172a;box-shadow:0 20px 45px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.12);';
+		const modelPopupIframe = document.createElement('iframe');
+		modelPopupIframe.style.cssText = 'width:100%;height:100%;border:0;display:block;';
+		modelPopupIframe.title = 'Modelo 3D';
+		modelPopupIframe.allow = 'autoplay; fullscreen; xr-spatial-tracking';
+		modelPopupIframe.allowFullscreen = true;
+		modelPopup.appendChild(modelPopupIframe);
+		const modelPopupCredit = document.createElement('a');
+		modelPopupCredit.style.cssText = 'position:absolute;bottom:6px;right:6px;border-radius:4px;background:rgba(0,0,0,0.6);padding:2px 6px;font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.9);text-decoration:none;';
+		modelPopupCredit.target = '_blank';
+		modelPopupCredit.rel = 'noopener noreferrer';
+		modelPopup.appendChild(modelPopupCredit);
+		document.body.appendChild(modelPopup);
+
+		let modelPopupHideTimer = null;
+		function showModelPopup(aircraft, anchorRect) {
+			clearTimeout(modelPopupHideTimer);
+			const scale = 1.4;
+			const width = anchorRect.width * scale;
+			const height = anchorRect.height * scale;
+			const margin = 8;
+			let left = anchorRect.left - (width - anchorRect.width) / 2;
+			let top = anchorRect.top - (height - anchorRect.height) / 2;
+			left = Math.min(Math.max(left, margin), window.innerWidth - width - margin);
+			top = Math.min(Math.max(top, margin), window.innerHeight - height - margin);
+			modelPopup.style.left = `${left}px`;
+			modelPopup.style.top = `${top}px`;
+			modelPopup.style.width = `${width}px`;
+			modelPopup.style.height = `${height}px`;
+			modelPopupCredit.href = `https://sketchfab.com/3d-models/${aircraft.sketchfabId}`;
+			modelPopupCredit.textContent = `Modelo 3D: ${aircraft.sketchfabAuthor || 'Sketchfab'}`;
+			if (modelPopupIframe.dataset.currentId !== aircraft.sketchfabId) {
+				modelPopupIframe.src = `https://sketchfab.com/models/${aircraft.sketchfabId}/embed?autostart=1&preload=1&ui_theme=dark&ui_infos=0&ui_watermark_link=0`;
+				modelPopupIframe.dataset.currentId = aircraft.sketchfabId;
+			}
+			modelPopup.style.display = 'block';
+		}
+		function scheduleHideModelPopup() {
+			clearTimeout(modelPopupHideTimer);
+			modelPopupHideTimer = setTimeout(() => {
+				modelPopup.style.display = 'none';
+				modelPopupIframe.src = '';
+				modelPopupIframe.dataset.currentId = '';
+			}, 200);
+		}
+		modelPopup.addEventListener('mouseenter', () => clearTimeout(modelPopupHideTimer));
+		modelPopup.addEventListener('mouseleave', () => scheduleHideModelPopup());
 
 		function setActiveCountry(country) {
 			document.querySelectorAll('.manufacturer-group').forEach((group) => {
@@ -517,10 +588,20 @@
 
 			const plane = document.createElement('img');
 			plane.className = 'plane-icon';
-			plane.src = './images/AviaoSVG.svg';
+			plane.src = '../images/AviaoSVG.svg';
 			plane.alt = '';
 			plane.setAttribute('aria-hidden', 'true');
 			heading.appendChild(plane);
+
+			if (manufacturerInfo && manufacturerInfo.logo) {
+				const mfrLogo = document.createElement('img');
+				mfrLogo.className = 'mfr-logo';
+				mfrLogo.src = manufacturerInfo.logo;
+				mfrLogo.alt = '';
+				mfrLogo.loading = 'lazy';
+				mfrLogo.setAttribute('aria-hidden', 'true');
+				heading.appendChild(mfrLogo);
+			}
 
 			const grid = document.createElement('div');
 			grid.className = 'aircraft-grid mt-0 rounded-b-[12px] bg-[#edf3fb] grid items-start gap-5 md:grid-cols-3 mb-8';
@@ -578,12 +659,26 @@
 				card.style.flex = '0 0 calc((100% - 2.5rem) / 3)';
 				card.style.scrollSnapAlign = 'start';
 
+				const mediaWrap = document.createElement('div');
+				mediaWrap.className = 'relative h-44 w-full overflow-hidden';
+
 				const img = document.createElement('img');
 				img.src = aircraft.image;
 				img.alt = aircraft.alt || aircraft.name;
 				img.loading = 'lazy';
-				img.className = 'h-44 w-full object-cover transition duration-300 group-hover:scale-105';
-				card.appendChild(img);
+				img.className = 'h-full w-full object-cover transition duration-300 group-hover:scale-105';
+				mediaWrap.appendChild(img);
+
+				if (aircraft.sketchfabId) {
+					mediaWrap.addEventListener('mouseenter', () => {
+						showModelPopup(aircraft, mediaWrap.getBoundingClientRect());
+					});
+					mediaWrap.addEventListener('mouseleave', () => {
+						scheduleHideModelPopup();
+					});
+				}
+
+				card.appendChild(mediaWrap);
 
 				const title = document.createElement('span');
 				title.className = 'aircraft-title block px-5 pb-2 pt-4 text-center text-lg font-extrabold leading-tight text-slate-900';
@@ -651,6 +746,6 @@
 			});
 		});
 	</script>
-	<script src="./bob-chatbot.js"></script>
+	<script src="../js/bob-chatbot.js"></script>
 </body>
 </html>
