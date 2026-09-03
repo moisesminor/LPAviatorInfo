@@ -12,6 +12,73 @@
 	const refreshButton = document.getElementById('radar-refresh');
 	const featuredWrap = document.getElementById('featured-flights');
 	const featuredList = document.getElementById('featured-flights-list');
+	const demoBannerEl = document.getElementById('track-demo-banner');
+
+	const MOCK_AIRPORTS = {
+		GRU: { name: 'Aeroporto Internacional de São Paulo/Guarulhos', icao: 'SBGR' },
+		CGH: { name: 'Aeroporto de Congonhas', icao: 'SBSP' },
+		SDU: { name: 'Aeroporto Santos Dumont', icao: 'SBRJ' },
+		GIG: { name: 'Aeroporto Internacional do Galeão', icao: 'SBGL' },
+		SSA: { name: 'Aeroporto Internacional de Salvador', icao: 'SBSV' },
+		REC: { name: 'Aeroporto Internacional do Recife', icao: 'SBRF' },
+		BSB: { name: 'Aeroporto Internacional de Brasília', icao: 'SBBR' },
+		POA: { name: 'Aeroporto Salgado Filho', icao: 'SBPA' }
+	};
+
+	const MOCK_FLIGHTS = [
+		{ flight_iata: 'LA3301', airline: 'LATAM Airlines Brasil', airline_iata: 'LA', dep: 'GRU', arr: 'SDU', durationMin: 65, elapsedFraction: 0.4, aircraft: { iata: 'A320', registration: 'PR-XBA' } },
+		{ flight_iata: 'G31234', airline: 'GOL Linhas Aéreas', airline_iata: 'G3', dep: 'CGH', arr: 'SSA', durationMin: 150, elapsedFraction: 0.55, aircraft: { iata: 'B738', registration: 'PR-GXK' } },
+		{ flight_iata: 'AD4050', airline: 'Azul Linhas Aéreas', airline_iata: 'AD', dep: 'POA', arr: 'BSB', durationMin: 180, elapsedFraction: 0.25, aircraft: { iata: 'A20N', registration: 'PR-YRP' } },
+		{ flight_iata: 'G31500', airline: 'GOL Linhas Aéreas', airline_iata: 'G3', dep: 'GIG', arr: 'REC', durationMin: 140, elapsedFraction: 0.7, aircraft: { iata: 'B737', registration: 'PR-GXD' } }
+	];
+
+	function buildMockFlight(code) {
+		const normalizedCode = String(code || '').trim().toUpperCase();
+		const template = MOCK_FLIGHTS.find((f) => f.flight_iata === normalizedCode) || MOCK_FLIGHTS[0];
+		const dep = MOCK_AIRPORTS[template.dep];
+		const arr = MOCK_AIRPORTS[template.arr];
+		const now = Date.now();
+		const totalMs = template.durationMin * 60000;
+		const depMs = now - totalMs * template.elapsedFraction;
+		const arrMs = depMs + totalMs;
+
+		return {
+			flight_number: normalizedCode.replace(/^[A-Z]+/, ''),
+			flight_iata: normalizedCode || template.flight_iata,
+			airline: template.airline,
+			airline_iata: template.airline_iata,
+			aircraft: template.aircraft,
+			departure: {
+				airport: dep.name,
+				iata: template.dep,
+				icao: dep.icao,
+				scheduled: new Date(depMs).toISOString(),
+				actual: new Date(depMs).toISOString()
+			},
+			arrival: {
+				airport: arr.name,
+				iata: template.arr,
+				icao: arr.icao,
+				scheduled: new Date(arrMs).toISOString(),
+				actual: null
+			},
+			status: 'active',
+			live: { is_live: false, latitude: null, longitude: null, altitude_ft: null, speed_kmh: null, direction: null },
+			isMock: true
+		};
+	}
+
+	function buildMockFeaturedFlights() {
+		return MOCK_FLIGHTS.map((template) => ({
+			flight_iata: template.flight_iata,
+			airline: template.airline,
+			dep_iata: template.dep,
+			arr_iata: template.arr,
+			status: 'active',
+			live: { is_live: false, altitude_ft: null, speed_kmh: null, direction: null },
+			isMock: true
+		}));
+	}
 
 	const STATUS_MAP = {
 		scheduled: { label: 'Programado', className: 'bg-slate-500/80 text-white' },
@@ -282,7 +349,10 @@
 		document.getElementById('stat-remaining').textContent = flight.status === 'landed' ? 'Pousou' : remainingLabel;
 
 		const liveNote = document.getElementById('stat-live-note');
-		if (hasLivePos) {
+		if (flight.isMock) {
+			liveNote.textContent = 'Estes dados são um exemplo ilustrativo, pois a API de rastreio está indisponível no momento.';
+			liveNote.classList.remove('hidden');
+		} else if (hasLivePos) {
 			liveNote.classList.add('hidden');
 		} else if (isEstimatedDynamics) {
 			liveNote.textContent = 'A API não fornece telemetria ao vivo (é preciso um plano AviationStack com Real-Time Flight Tracking). Os valores com "≈" são estimados pela fase do voo (subida/cruzeiro/descida) e pela rota entre os aeroportos.';
@@ -306,16 +376,27 @@
 		trigger.disabled = true;
 		if (!silent) setError('');
 
+		let flight = null;
+		let apiUnavailable = false;
+
 		try {
 			const response = await fetch(`/api/flights/search?flight_iata=${encodeURIComponent(code)}&limit=1`);
 			const data = await response.json();
 
-			if (!response.ok) {
-				throw new Error(data.error || 'Erro ao consultar o voo.');
+			if (!response.ok || data.error) {
+				apiUnavailable = true;
+			} else {
+				flight = Array.isArray(data.results) ? data.results[0] : null;
 			}
+		} catch (error) {
+			apiUnavailable = true;
+		}
 
-			const flight = Array.isArray(data.results) ? data.results[0] : null;
+		if (apiUnavailable) {
+			flight = buildMockFlight(code);
+		}
 
+		try {
 			if (!flight) {
 				resultEl.classList.add('hidden');
 				emptyEl.classList.remove('hidden');
@@ -326,6 +407,7 @@
 			emptyEl.classList.add('hidden');
 			resultEl.classList.remove('hidden');
 			currentFlightCode = code;
+			demoBannerEl.classList.toggle('hidden', !flight.isMock);
 
 			await renderFlight(flight);
 			updateRadarPanel();
@@ -353,7 +435,12 @@
 			label.textContent = `${flight.flight_iata} · ${flight.airline} · ${flight.dep_iata}→${flight.arr_iata}`;
 			chip.appendChild(label);
 
-			if (flight.status === 'active') {
+			if (flight.isMock) {
+				const badge = document.createElement('span');
+				badge.className = 'inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800';
+				badge.textContent = 'Exemplo';
+				chip.appendChild(badge);
+			} else if (flight.status === 'active') {
 				const badge = document.createElement('span');
 				badge.className = 'inline-flex animate-pulse items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white';
 				badge.textContent = live.is_live ? 'Ao vivo' : 'Em voo';
@@ -388,13 +475,19 @@
 			if (!response.ok) {
 				const body = await response.json().catch(() => null);
 				console.warn('[rastreio] /api/flights/featured falhou:', response.status, body?.error || '(sem detalhes)');
+				renderFeaturedFlights(buildMockFeaturedFlights());
 				return;
 			}
 			const data = await response.json();
+			if (data.error || !data.flights || !data.flights.length) {
+				renderFeaturedFlights(buildMockFeaturedFlights());
+				return;
+			}
 			renderFeaturedFlights(data.flights);
 		} catch (error) {
-			// Sem voos em destaque disponíveis; a busca manual continua funcionando.
+			// API fora do ar: mostra voos de exemplo até que ela volte.
 			console.warn('[rastreio] /api/flights/featured: erro de rede ou servidor fora do ar:', error.message);
+			renderFeaturedFlights(buildMockFeaturedFlights());
 		}
 	}
 
