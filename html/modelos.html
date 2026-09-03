@@ -129,6 +129,28 @@
 			opacity: 1;
 			transform: translateY(-50%) rotate(4deg) scale(1);
 		}
+		h3.group .mfr-logo {
+			position: absolute;
+			top: 50%;
+			right: 1.35rem;
+			width: 2.5rem;
+			height: 2.5rem;
+			padding: 0.3rem;
+			border-radius: 8px;
+			background: #ffffff;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			object-fit: contain;
+			transform: translateY(-50%) scale(1);
+			opacity: 1;
+			z-index: 2;
+			pointer-events: none;
+			transition: opacity 380ms ease 850ms, transform 380ms ease 850ms;
+		}
+		h3.group.expanded .mfr-logo {
+			opacity: 0;
+			transform: translateY(-50%) translateX(18px) scale(0.55);
+			transition: opacity 320ms ease, transform 380ms ease;
+		}
 		h3.group::before {
 			content: "";
 			position: absolute;
@@ -407,6 +429,55 @@
 		const MANUFACTURER_INFO = window.MANUFACTURER_INFO || {};
 		const countryFilterContainer = document.getElementById('country-filter');
 
+		const modelPopup = document.createElement('div');
+		modelPopup.style.cssText = 'position:fixed;z-index:9999;display:none;overflow:hidden;border-radius:10px;background:#0f172a;box-shadow:0 20px 45px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.12);';
+		const modelPopupIframe = document.createElement('iframe');
+		modelPopupIframe.style.cssText = 'width:100%;height:100%;border:0;display:block;';
+		modelPopupIframe.title = 'Modelo 3D';
+		modelPopupIframe.allow = 'autoplay; fullscreen; xr-spatial-tracking';
+		modelPopupIframe.allowFullscreen = true;
+		modelPopup.appendChild(modelPopupIframe);
+		const modelPopupCredit = document.createElement('a');
+		modelPopupCredit.style.cssText = 'position:absolute;bottom:6px;right:6px;border-radius:4px;background:rgba(0,0,0,0.6);padding:2px 6px;font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.9);text-decoration:none;';
+		modelPopupCredit.target = '_blank';
+		modelPopupCredit.rel = 'noopener noreferrer';
+		modelPopup.appendChild(modelPopupCredit);
+		document.body.appendChild(modelPopup);
+
+		let modelPopupHideTimer = null;
+		function showModelPopup(aircraft, anchorRect) {
+			clearTimeout(modelPopupHideTimer);
+			const scale = 1.4;
+			const width = anchorRect.width * scale;
+			const height = anchorRect.height * scale;
+			const margin = 8;
+			let left = anchorRect.left - (width - anchorRect.width) / 2;
+			let top = anchorRect.top - (height - anchorRect.height) / 2;
+			left = Math.min(Math.max(left, margin), window.innerWidth - width - margin);
+			top = Math.min(Math.max(top, margin), window.innerHeight - height - margin);
+			modelPopup.style.left = `${left}px`;
+			modelPopup.style.top = `${top}px`;
+			modelPopup.style.width = `${width}px`;
+			modelPopup.style.height = `${height}px`;
+			modelPopupCredit.href = `https://sketchfab.com/3d-models/${aircraft.sketchfabId}`;
+			modelPopupCredit.textContent = `Modelo 3D: ${aircraft.sketchfabAuthor || 'Sketchfab'}`;
+			if (modelPopupIframe.dataset.currentId !== aircraft.sketchfabId) {
+				modelPopupIframe.src = `https://sketchfab.com/models/${aircraft.sketchfabId}/embed?autostart=1&preload=1&ui_theme=dark&ui_infos=0&ui_watermark_link=0`;
+				modelPopupIframe.dataset.currentId = aircraft.sketchfabId;
+			}
+			modelPopup.style.display = 'block';
+		}
+		function scheduleHideModelPopup() {
+			clearTimeout(modelPopupHideTimer);
+			modelPopupHideTimer = setTimeout(() => {
+				modelPopup.style.display = 'none';
+				modelPopupIframe.src = '';
+				modelPopupIframe.dataset.currentId = '';
+			}, 200);
+		}
+		modelPopup.addEventListener('mouseenter', () => clearTimeout(modelPopupHideTimer));
+		modelPopup.addEventListener('mouseleave', () => scheduleHideModelPopup());
+
 		function setActiveCountry(country) {
 			document.querySelectorAll('.manufacturer-group').forEach((group) => {
 				const matches = !country || group.dataset.country === country;
@@ -507,11 +578,20 @@
 			plane.setAttribute('aria-hidden', 'true');
 			heading.appendChild(plane);
 
+			if (manufacturerInfo && manufacturerInfo.logo) {
+				const mfrLogo = document.createElement('img');
+				mfrLogo.className = 'mfr-logo';
+				mfrLogo.src = manufacturerInfo.logo;
+				mfrLogo.alt = '';
+				mfrLogo.loading = 'lazy';
+				mfrLogo.setAttribute('aria-hidden', 'true');
+				heading.appendChild(mfrLogo);
+			}
+
 			const grid = document.createElement('div');
 			grid.className = 'aircraft-grid mt-0 mb-8 w-full rounded-b-[12px] bg-[#edf3fb]';
 			const track = document.createElement('div');
-			track.className = 'aircraft-track flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3';
-			track.style.gridColumn = '1 / -1';
+			track.className = 'aircraft-track flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:gap-6';
 			grid.appendChild(track);
 
 			group.appendChild(heading);
@@ -557,18 +637,32 @@
 
 			models.filter((model) => model.manufacturer === manufacturer).forEach((aircraft) => {
 				const card = document.createElement('article');
-				card.className = 'group aircraft-card snap-center shrink-0 w-[85vw] max-w-[320px] overflow-hidden break-words rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)] md:w-full md:max-w-none md:shrink';
+				card.className = 'group aircraft-card snap-center shrink-0 w-[85vw] max-w-[320px] overflow-hidden break-words rounded-[10px] bg-white/[0.92] text-slate-900 shadow-[0_8px_20px_rgba(2,6,23,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(2,6,23,0.25)]';
 				card.style.minWidth = '0';
 				card.style.maxWidth = '320px';
 				card.style.flex = '0 0 auto';
 				card.style.scrollSnapAlign = 'center';
 
+				const mediaWrap = document.createElement('div');
+				mediaWrap.className = 'relative h-36 w-full overflow-hidden sm:h-40';
+
 				const img = document.createElement('img');
 				img.src = aircraft.image;
 				img.alt = aircraft.alt || aircraft.name;
 				img.loading = 'lazy';
-				img.className = 'h-36 w-full object-cover transition duration-300 group-hover:scale-105 sm:h-40';
-				card.appendChild(img);
+				img.className = 'h-full w-full object-cover transition duration-300 group-hover:scale-105';
+				mediaWrap.appendChild(img);
+
+				if (aircraft.sketchfabId) {
+					mediaWrap.addEventListener('mouseenter', () => {
+						showModelPopup(aircraft, mediaWrap.getBoundingClientRect());
+					});
+					mediaWrap.addEventListener('mouseleave', () => {
+						scheduleHideModelPopup();
+					});
+				}
+
+				card.appendChild(mediaWrap);
 
 				const title = document.createElement('span');
 				title.className = 'aircraft-title block w-full max-w-full p-4 text-center text-base font-extrabold leading-tight text-slate-900 break-words sm:p-6 sm:text-lg';
