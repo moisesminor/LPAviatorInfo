@@ -8,12 +8,12 @@
 	<link rel="stylesheet" href="./dist/tailwind.css">
 </head>
 	<body class="m-0 min-h-screen overflow-x-clip bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
-	<header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
-		<div class="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
+	<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
+		<div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
 			<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./index.html" aria-label="Ir para a página principal">
 				<img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="./images/AviatorLogo.png" alt="Aviator Info">
 			</a>
-			<nav class="no-scrollbar flex items-center gap-0.5 overflow-x-auto sm:gap-2">
+			<nav class="hidden items-center gap-0.5 sm:flex sm:gap-2" aria-label="Links principais">
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./modelos.html">Modelos</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./aeroportos.html">Aeroportos</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./companhias.html">Companhias</a>
@@ -21,7 +21,19 @@
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./comparar.html">Comparar</a>
 			</nav>
+			<button type="button" id="nav-toggle" class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:hidden" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menu">
+				<svg id="nav-icon-open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+				<svg id="nav-icon-close" class="hidden h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+			</button>
 		</div>
+		<nav id="mobile-nav" class="hidden w-full flex-col gap-1 border-t border-white/10 bg-[#173f91] px-3 pb-3 pt-2 sm:hidden" aria-label="Links principais (menu móvel)">
+				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./modelos.html">Modelos</a>
+				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./aeroportos.html">Aeroportos</a>
+				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./companhias.html">Companhias</a>
+				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./simulacao.html">Simulação</a>
+				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./rastreio.html">Rastreio</a>
+				<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./comparar.html">Comparar</a>
+		</nav>
 	</header>
 	<main class="min-h-screen">
 		<section class="relative isolate flex h-[100svh] min-h-[560px] w-full items-center justify-center overflow-hidden bg-[#0a1830]" id="hero" aria-labelledby="home-title">
@@ -55,6 +67,7 @@
 	<script>
 		document.getElementById('year').textContent = new Date().getFullYear();
 	</script>
+	<script src="./header-nav.js"></script>
 	<script src="./vendor/gsap.min.js"></script>
 	<script src="./vendor/ScrollTrigger.min.js"></script>
 	<script src="./hero.js"></script>

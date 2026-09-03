@@ -1020,7 +1020,7 @@
 					left: 12px !important;
 					bottom: 96px !important;
 					width: auto !important;
-					height: min(560px, calc(100vh - 140px)) !important;
+					height: min(500px, calc(100vh - 170px)) !important;
 				}
 			}
 		`;
