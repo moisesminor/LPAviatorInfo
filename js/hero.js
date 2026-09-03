@@ -33,12 +33,6 @@
 	].filter(function (step) { return !!step.el; });
 
 	var reduceMotionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
-	// Em celular o decodificador de vídeo não acompanha um seek a cada pixel
-	// de scroll: os frames intermediários são descartados e só o primeiro e
-	// o último quadro chegam a aparecer. Nesses aparelhos o vídeo toca normal
-	// (play) em vez de ser scrubado por currentTime; só o texto continua
-	// sincronizado com o scroll.
-	var mobileMQ = window.matchMedia('(max-width: 768px)');
 	var teardown = null;
 	var metadataListenerAttached = false;
 
@@ -92,8 +86,6 @@
 	}
 
 	function mountScrub() {
-		var isMobile = mobileMQ.matches;
-
 		video.pause();
 		video.currentTime = 0;
 
@@ -113,14 +105,6 @@
 				invalidateOnRefresh: true,
 				onToggle: function (self) {
 					hero.classList.toggle('is-live', self.isActive);
-					if (isMobile) {
-						if (self.isActive) {
-							video.currentTime = 0;
-							video.play().catch(function () {});
-						} else {
-							video.pause();
-						}
-					}
 				},
 			},
 		});
@@ -128,15 +112,14 @@
 		// Playhead do vídeo: 0 -> duration ao longo de toda a timeline (posição
 		// 0, duration 1 = "a timeline inteira"). ease 'none' é obrigatório aqui
 		// — é o que garante 1 scroll pixel = 1 avanço proporcional de vídeo.
-		// Em mobile o onUpdate fica de fora: essa tween só serve para manter a
-		// duração/proporção da timeline igual (mesmo timing de revelação do
-		// texto), o vídeo toca sozinho via play() no onToggle acima.
+		// Vale em qualquer tamanho de tela: o vídeo nunca dá play sozinho, só
+		// avança/volta acompanhando o scroll.
 		var playhead = { t: 0 };
 		tl.to(playhead, {
 			t: video.duration || 1,
 			ease: 'none',
 			duration: 1,
-			onUpdate: isMobile ? undefined : function () { video.currentTime = playhead.t; },
+			onUpdate: function () { video.currentTime = playhead.t; },
 		}, 0);
 
 		revealSteps.forEach(function (step) {
@@ -157,12 +140,6 @@
 	} else if (reduceMotionMQ.addListener) {
 		// Safari antigo
 		reduceMotionMQ.addListener(boot);
-	}
-
-	if (mobileMQ.addEventListener) {
-		mobileMQ.addEventListener('change', boot);
-	} else if (mobileMQ.addListener) {
-		mobileMQ.addListener(boot);
 	}
 
 	boot();
