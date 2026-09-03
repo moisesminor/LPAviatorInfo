@@ -1,0 +1,14 @@
+node_modules
+.git
+.claude
+.env
+.env.example
+package.json
+package-lock.json
+server.js
+scripts
+src
+tailwind.config.js
+functions
+.assetsignore
+.gitignore
