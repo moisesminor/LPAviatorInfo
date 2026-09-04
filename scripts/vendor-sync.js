@@ -16,6 +16,12 @@ const files = [
 	['gsap/dist/ScrollTrigger.min.js', 'ScrollTrigger.min.js'],
 	['lenis/dist/lenis.min.js', 'lenis.min.js'],
 	['lenis/LICENSE', 'lenis-LICENSE'],
+	// three.min.js é o build UMD legado (global `THREE`), usado só pelo hero 3D
+	// de mobile (js/hero-aircraft.js) e carregado sob demanda. O pacote `three`
+	// só publica ESM nas versões novas; mantemos preso em 0.160.x, que ainda
+	// traz dist/three.min.js.
+	['three/build/three.min.js', 'three.min.js'],
+	['three/LICENSE', 'three-LICENSE'],
 	['leaflet/dist/leaflet.js', 'leaflet/leaflet.js'],
 	['leaflet/dist/leaflet.css', 'leaflet/leaflet.css'],
 	['leaflet/dist/images/marker-icon.png', 'leaflet/images/marker-icon.png'],
@@ -33,6 +39,10 @@ fs.mkdirSync(path.join(out, 'leaflet', 'images'), { recursive: true });
 for (const [from, to] of files) {
 	const src = path.join(root, 'node_modules', from);
 	const dest = path.join(out, to);
+	if (!fs.existsSync(src)) {
+		console.warn(`vendor -- pulando ${from} (não instalado em node_modules); rode "npm install" e tente de novo`);
+		continue;
+	}
 	fs.copyFileSync(src, dest);
 	console.log(`vendor <- ${from}`);
 }

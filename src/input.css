@@ -34,3 +34,90 @@
 #hero.is-live #hero-copy {
   will-change: transform, opacity;
 }
+
+/* Hero em 3D (só mobile): o vídeo com scrub de scroll é pesado e desajeitado
+   em tela pequena, então abaixo de 768px o hero.js não monta o scrub e o
+   hero-aircraft.js coloca um modelo de avião interativo (Three.js procedural,
+   no espírito da lib img2threejs) no hero. */
+#hero-aircraft {
+  touch-action: pan-y; /* arrasto horizontal gira o avião; vertical rola a página */
+  overflow: hidden;
+}
+
+#hero-aircraft canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#hero-aircraft > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6% 8%;
+}
+
+/* Fundo liquid ether (fluido WebGL) atrás do avião e do texto. Não captura
+   ponteiro — o solver escuta a janela e testa se o toque está sobre a área,
+   então arrastar o avião / tocar os botões continua funcionando. O shader já
+   sai transparente em repouso e ganha cor conforme o fluido se move, então
+   basta compor por cima do navy do hero. */
+#hero-ether {
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+#hero-ether canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Com o avião 3D ativo (só mobile), o hero vira uma coluna que CRESCE com o
+   conteúdo: uma faixa no topo só para o modelo e, abaixo, o texto no fluxo
+   normal. Nada de altura fixa + flex-end (era o que cortava o topo do título
+   quando o conteúdo não cabia em 100svh). A classe .aircraft-live só é ligada
+   no mobile pelo hero-aircraft.js. */
+#hero.aircraft-live {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: auto;
+  min-height: 100svh;
+  padding-bottom: 2.5rem;
+}
+
+#hero.aircraft-live #hero-aircraft {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  width: 100%;
+  height: min(46vh, 380px); /* faixa só do modelo, no topo */
+  flex: 0 0 auto;
+}
+
+#hero.aircraft-live #hero-copy {
+  position: relative;
+  margin-top: 1.25rem;
+  margin-bottom: 0;
+  text-shadow: 0 1px 8px rgba(4, 10, 22, 0.45);
+}
+
+/* fundo do fluido cobre o hero inteiro, inclusive a parte que cresceu */
+#hero.aircraft-live #hero-ether,
+#hero.aircraft-live .hero-scrim {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+#hero.aircraft-live .hero-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 24, 48, 0.25) 0%,
+    rgba(10, 24, 48, 0.08) 22%,
+    rgba(10, 24, 48, 0.45) 46%,
+    rgba(10, 24, 48, 0.92) 72%,
+    rgba(10, 24, 48, 0.97) 100%
+  );
+}
