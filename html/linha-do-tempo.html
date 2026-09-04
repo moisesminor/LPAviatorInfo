@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="description" content="Linha do tempo da aviação: marcos históricos e acidentes marcantes lado a lado, com prévia ao passar o mouse na data e card completo ao clicar.">
+	<link rel="icon" href="../images/LogoAviatorInfo.ico" type="image/x-icon">
+	<title>Linha do tempo | Aviator Info</title>
+	<link rel="stylesheet" href="../dist/tailwind.css">
+	<style>
+		/* ===== Linha do tempo — segue o sistema visual do site (azul #1e56c9 / slate) ===== */
+
+		.tl-intro { max-width: 62ch; }
+
+		.tl-columns {
+			margin-top: 2.75rem;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.75rem;
+			align-items: start;
+		}
+		@media (max-width: 900px) {
+			.tl-columns { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+		}
+
+		.tl-panel {
+			--tl-accent: #1e56c9;
+			--tl-accent-soft: #dbe7fb;
+			background: #ffffff;
+			border: 1px solid rgba(15, 23, 42, 0.08);
+			border-radius: 1.25rem;
+			padding: 1.6rem 1.25rem 2.5rem;
+			box-shadow: 0 14px 34px rgba(16, 45, 85, 0.09);
+		}
+		.tl-panel[data-kind="acidentes"] {
+			--tl-accent: #c01d1d;
+			--tl-accent-soft: #f6dada;
+		}
+
+		.tl-eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.55rem;
+			font-size: 0.7rem;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			color: var(--tl-accent);
+		}
+		.tl-eyebrow::before {
+			content: "";
+			width: 1.5rem;
+			height: 2px;
+			background: currentColor;
+		}
+		.tl-panel h2 {
+			margin: 0.55rem 0 0.4rem;
+			font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+			font-weight: 800;
+			color: #102d55;
+			letter-spacing: -0.01em;
+			text-wrap: balance;
+		}
+		.tl-panel .tl-lead {
+			font-size: 0.9rem;
+			line-height: 1.55;
+			color: #47566b;
+			max-width: 42ch;
+		}
+
+		/* ---- Eixo ---- */
+		.tl-track {
+			list-style: none;
+			margin: 2.4rem 0 0;
+			padding: 0;
+			position: relative;
+		}
+		.tl-track::before {
+			content: "";
+			position: absolute;
+			top: 0.6rem;
+			bottom: 0.6rem;
+			left: 50%;
+			width: 2px;
+			transform: translateX(-50%);
+			background: linear-gradient(to bottom, transparent, var(--tl-accent-soft) 7%, var(--tl-accent-soft) 93%, transparent);
+		}
+
+		.tl-item {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 1.45rem 0;
+		}
+
+		/* ---- Marcador: bolinha + data, centralizados no eixo ---- */
+		.tl-marker {
+			position: relative;
+			z-index: 2;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.3rem 0.6rem;
+			background: none;
+			border: none;
+			border-radius: 0.6rem;
+			cursor: pointer;
+			transition: transform 200ms ease;
+		}
+		.tl-dot {
+			width: 15px;
+			height: 15px;
+			border-radius: 50%;
+			background: var(--tl-accent);
+			box-shadow: 0 0 0 5px #ffffff, 0 0 0 6px var(--tl-accent-soft);
+			transition: transform 200ms ease, box-shadow 200ms ease;
+		}
+		.tl-year {
+			font-size: 0.95rem;
+			font-weight: 800;
+			color: #102d55;
+			font-variant-numeric: tabular-nums;
+			letter-spacing: 0.02em;
+			transition: transform 200ms ease, color 200ms ease;
+		}
+		.tl-marker:hover .tl-dot,
+		.tl-marker:focus-visible .tl-dot,
+		.tl-item.is-active .tl-dot {
+			transform: scale(1.5);
+			box-shadow: 0 0 0 5px #ffffff, 0 0 0 7px var(--tl-accent);
+		}
+		.tl-marker:hover .tl-year,
+		.tl-marker:focus-visible .tl-year,
+		.tl-item.is-active .tl-year {
+			transform: scale(1.12);
+			color: var(--tl-accent);
+		}
+		.tl-marker:focus-visible {
+			outline: 2px solid var(--tl-accent);
+			outline-offset: 3px;
+		}
+
+		/* ---- Pré-visualização (hover na bolinha) ---- */
+		.tl-preview {
+			position: absolute;
+			z-index: 20;
+			top: calc(100% - 0.4rem);
+			left: 50%;
+			width: min(15rem, 80vw);
+			transform: translate(-50%, 0.4rem);
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
+			background: #ffffff;
+			border: 1px solid rgba(15, 23, 42, 0.1);
+			border-radius: 0.85rem;
+			padding: 0.7rem;
+			box-shadow: 0 20px 40px rgba(16, 45, 85, 0.22);
+			transition: opacity 170ms ease, transform 170ms ease, visibility 170ms;
+		}
+		.tl-item.is-hover .tl-preview {
+			opacity: 1;
+			visibility: visible;
+			transform: translate(-50%, 0);
+		}
+		.tl-item.is-active .tl-preview {
+			opacity: 0 !important;
+			visibility: hidden !important;
+		}
+		.tl-preview-img {
+			width: 100%;
+			height: 5.5rem;
+			object-fit: cover;
+			border-radius: 0.55rem;
+			margin-bottom: 0.5rem;
+			background: #eef2f7;
+		}
+		.tl-preview-title {
+			font-size: 0.85rem;
+			font-weight: 800;
+			color: #102d55;
+			line-height: 1.3;
+		}
+		.tl-preview-text {
+			margin-top: 0.25rem;
+			font-size: 0.76rem;
+			line-height: 1.45;
+			color: #5a6a80;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+		.tl-preview-hint {
+			display: block;
+			margin-top: 0.5rem;
+			font-size: 0.66rem;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--tl-accent);
+		}
+
+		.tl-empty-msg {
+			text-align: center;
+			color: #64748b;
+			font-size: 0.88rem;
+			padding: 1.5rem 0;
+		}
+		.tl-empty-msg code {
+			background: #eef2f7;
+			border-radius: 0.3rem;
+			padding: 0.05rem 0.3rem;
+			font-size: 0.82rem;
+		}
+
+		/* ---- Modal do card completo (clique) ---- */
+		.tl-modal {
+			position: fixed;
+			inset: 0;
+			z-index: 100;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 1.5rem;
+			background: rgba(9, 18, 38, 0.55);
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity 200ms ease, visibility 200ms;
+		}
+		.tl-modal[hidden] { display: none; }
+		.tl-modal.is-open {
+			opacity: 1;
+			visibility: visible;
+		}
+		.tl-modal-card {
+			--tl-accent: #1e56c9;
+			width: min(660px, 100%);
+			max-height: min(86vh, 800px);
+			display: flex;
+			flex-direction: column;
+			background: #ffffff;
+			border-radius: 1.1rem;
+			overflow: hidden;
+			box-shadow: 0 34px 80px rgba(9, 18, 38, 0.42);
+			transform: translateY(14px) scale(0.985);
+			transition: transform 220ms ease;
+		}
+		.tl-modal-card[data-kind="acidentes"] { --tl-accent: #c01d1d; }
+		.tl-modal.is-open .tl-modal-card { transform: none; }
+		.tl-modal-head {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 1rem;
+			padding: 1.3rem 1.45rem 1.05rem;
+			border-bottom: 1px solid #eef1f5;
+		}
+		.tl-modal-eyebrow {
+			font-size: 0.72rem;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			color: var(--tl-accent);
+			font-variant-numeric: tabular-nums;
+		}
+		.tl-modal-title {
+			margin-top: 0.25rem;
+			font-size: clamp(1.2rem, 2.6vw, 1.45rem);
+			font-weight: 800;
+			color: #102d55;
+			line-height: 1.25;
+			text-wrap: balance;
+		}
+		.tl-modal-close {
+			flex-shrink: 0;
+			width: 2rem;
+			height: 2rem;
+			border-radius: 9999px;
+			border: 1px solid #e2e8f0;
+			background: #f8fafc;
+			color: #334155;
+			font-size: 1.2rem;
+			line-height: 1;
+			cursor: pointer;
+		}
+		.tl-modal-close:hover { background: #eef2f7; }
+		.tl-modal-close:focus-visible {
+			outline: 2px solid var(--tl-accent);
+			outline-offset: 2px;
+		}
+		.tl-modal-body {
+			padding: 1.25rem 1.45rem 1.6rem;
+			overflow-y: auto;
+		}
+		.tl-modal-body p {
+			font-size: 0.92rem;
+			line-height: 1.65;
+			color: #33425a;
+			margin: 0 0 0.9rem;
+		}
+		.tl-modal-figure { margin: 0 0 1rem; }
+		.tl-modal-figure img {
+			width: 100%;
+			border-radius: 0.7rem;
+			display: block;
+			background: #eef2f7;
+		}
+		.tl-modal-figure figcaption {
+			margin-top: 0.35rem;
+			font-size: 0.72rem;
+			color: #7a8699;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.tl-marker, .tl-dot, .tl-year, .tl-preview,
+			.tl-modal, .tl-modal-card { transition-duration: 0.01ms; }
+		}
+	</style>
+</head>
+<body class="m-0 min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 to-blue-500 pt-16 font-sans">
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-gradient-to-r from-[#1e56c9] to-[#4b95f5] shadow-lg shadow-black/10" aria-label="Navegação principal">
+	<div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-8">
+		<a class="group flex shrink-0 items-center rounded-xl p-1.5 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="../index.html" aria-label="Ir para a página principal"><img class="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105" src="../images/LogoAviatorInfo.png" alt="Aviator Info"></a>
+		<nav class="hidden items-center gap-0.5 sm:flex sm:gap-2" aria-label="Links principais">
+			<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./modelos.html">Modelos</a>
+			<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./aeroportos.html">Aeroportos</a>
+			<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./companhias.html">Companhias</a>
+			<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./simulacao.html">Simulação</a>
+			<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
+			<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./comparar.html">Comparar</a>
+			<a class="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-2 text-[13px] font-semibold text-[#1a56c4] shadow-sm sm:px-5 sm:text-base" href="./linha-do-tempo.html" aria-current="page">Linha do tempo</a>
+		</nav>
+		<button type="button" id="nav-toggle" class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:hidden" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menu">
+			<svg id="nav-icon-open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+			<svg id="nav-icon-close" class="hidden h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+		</button>
+	</div>
+	<nav id="mobile-nav" class="hidden w-full flex-col gap-1 border-t border-white/10 bg-[#173f91] px-3 pb-3 pt-2 sm:hidden" aria-label="Links principais (menu móvel)">
+		<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./modelos.html">Modelos</a>
+		<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./aeroportos.html">Aeroportos</a>
+		<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./companhias.html">Companhias</a>
+		<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./simulacao.html">Simulação</a>
+		<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./rastreio.html">Rastreio</a>
+		<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./comparar.html">Comparar</a>
+		<a class="block rounded-lg bg-white px-4 py-3 text-base font-semibold text-[#1a56c4]" href="./linha-do-tempo.html" aria-current="page">Linha do tempo</a>
+	</nav>
+</header>
+<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
+	<h1 class="mb-3 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#102d55]">Linha do tempo</h1>
+	<p class="tl-intro text-lg leading-[1.6] text-[#18283b]">Duas trilhas paralelas da aviação. Passe o mouse sobre uma data para ver a prévia; clique para abrir o card completo, com o texto e as imagens.</p>
+
+	<div class="tl-columns">
+		<section class="tl-panel" data-kind="historia" aria-labelledby="tl-historia-title">
+			<span class="tl-eyebrow">Progresso técnico</span>
+			<h2 id="tl-historia-title">História da Aviação</h2>
+			<p class="tl-lead">Os marcos que empurraram os limites do voo, do primeiro salto motorizado à era digital da cabine.</p>
+			<ul class="tl-track" id="timeline-historia"></ul>
+		</section>
+
+		<section class="tl-panel" data-kind="acidentes" aria-labelledby="tl-acidentes-title">
+			<span class="tl-eyebrow">Segurança de voo</span>
+			<h2 id="tl-acidentes-title">Acidentes Marcantes</h2>
+			<p class="tl-lead">Tragédias que forçaram mudanças em normas, projetos e procedimentos de toda a indústria.</p>
+			<ul class="tl-track" id="timeline-acidentes"></ul>
+		</section>
+	</div>
+</main>
+
+<div class="tl-modal" id="tl-modal" role="dialog" aria-modal="true" aria-labelledby="tl-modal-title" hidden>
+	<div class="tl-modal-card" id="tl-modal-card">
+		<div class="tl-modal-head">
+			<div>
+				<span class="tl-modal-eyebrow" id="tl-modal-eyebrow"></span>
+				<h3 class="tl-modal-title" id="tl-modal-title"></h3>
+			</div>
+			<button type="button" class="tl-modal-close" id="tl-modal-close" aria-label="Fechar card">&times;</button>
+		</div>
+		<div class="tl-modal-body" id="tl-modal-body"></div>
+	</div>
+</div>
+
+<script src="../js/header-nav.js"></script>
+<script src="../js/timeline-data.js"></script>
+<script>
+	(function () {
+		const escapeHtml = (value) =>
+			String(value).replace(/[&<>"']/g, (ch) => ({
+				'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+			}[ch]));
+
+		const KIND_LABEL = { historia: 'Marco histórico', acidentes: 'Acidente marcante' };
+
+		const modal = document.getElementById('tl-modal');
+		const modalCard = document.getElementById('tl-modal-card');
+		const modalEyebrow = document.getElementById('tl-modal-eyebrow');
+		const modalTitle = document.getElementById('tl-modal-title');
+		const modalBody = document.getElementById('tl-modal-body');
+		const modalClose = document.getElementById('tl-modal-close');
+
+		let lastFocused = null;
+		let activeItem = null;
+
+		function closeModal() {
+			modal.classList.remove('is-open');
+			modal.hidden = true;
+			if (activeItem) activeItem.classList.remove('is-active');
+			activeItem = null;
+			if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+		}
+
+		function openModal(item, data, kind) {
+			lastFocused = document.activeElement;
+			if (activeItem) activeItem.classList.remove('is-active');
+			activeItem = item;
+			item.classList.add('is-active');
+			item.classList.remove('is-hover');
+
+			modalCard.dataset.kind = kind;
+			modalEyebrow.textContent = `${KIND_LABEL[kind] || 'Evento'} · ${data.ano}`;
+			modalTitle.textContent = data.titulo;
+
+			const texto = Array.isArray(data.texto) ? data.texto : [];
+			const imagens = Array.isArray(data.imagens) ? data.imagens : [];
+			const paragraphs = texto.length
+				? texto.map((p) => `<p>${escapeHtml(p)}</p>`).join('')
+				: '<p>Texto ainda não cadastrado para este evento.</p>';
+			const figures = imagens.map((img) => `
+				<figure class="tl-modal-figure">
+					<img src="${escapeHtml(img.src)}" alt="${escapeHtml(data.titulo)}" loading="lazy">
+					${img.credito ? `<figcaption>${escapeHtml(img.credito)}</figcaption>` : ''}
+				</figure>`).join('');
+			modalBody.innerHTML = paragraphs + figures;
+			modalBody.scrollTop = 0;
+
+			modal.hidden = false;
+			// força reflow para a transição rodar a partir do estado oculto
+			void modal.offsetWidth;
+			modal.classList.add('is-open');
+			modalClose.focus();
+		}
+
+		function previewMarkup(data) {
+			const imagens = Array.isArray(data.imagens) ? data.imagens : [];
+			const img = imagens[0]
+				? `<img class="tl-preview-img" src="${escapeHtml(imagens[0].src)}" alt="${escapeHtml(data.titulo)}" loading="lazy">`
+				: '';
+			return `
+				${img}
+				<span class="tl-preview-title">${escapeHtml(data.titulo)}</span>
+				<span class="tl-preview-text">${escapeHtml(data.resumo || '')}</span>
+				<span class="tl-preview-hint">Clique para abrir</span>`;
+		}
+
+		function buildTimeline(rootId, items, kind) {
+			const root = document.getElementById(rootId);
+			if (!root) return;
+
+			const data = (Array.isArray(items) ? items.slice() : [])
+				.sort((a, b) => (a.ano || 0) - (b.ano || 0));
+
+			if (!data.length) {
+				root.innerHTML = '<li class="tl-empty-msg">Nenhum evento cadastrado ainda. Adicione entradas em <code>js/timeline-data.js</code>.</li>';
+				return;
+			}
+
+			data.forEach((entry) => {
+				const li = document.createElement('li');
+				li.className = 'tl-item';
+				li.innerHTML = `
+					<button type="button" class="tl-marker" aria-haspopup="dialog" aria-expanded="false">
+						<span class="tl-dot" aria-hidden="true"></span>
+						<span class="tl-year">${escapeHtml(entry.ano)}</span>
+					</button>
+					<div class="tl-preview" role="presentation">${previewMarkup(entry)}</div>`;
+
+				const marker = li.querySelector('.tl-marker');
+				marker.setAttribute('aria-label', `${entry.ano} — ${entry.titulo}`);
+
+				const showHover = () => {
+					if (!li.classList.contains('is-active')) li.classList.add('is-hover');
+				};
+				const hideHover = () => li.classList.remove('is-hover');
+
+				marker.addEventListener('mouseenter', showHover);
+				marker.addEventListener('mouseleave', hideHover);
+				marker.addEventListener('focus', showHover);
+				marker.addEventListener('blur', hideHover);
+				marker.addEventListener('click', () => {
+					marker.setAttribute('aria-expanded', 'true');
+					openModal(li, entry, kind);
+				});
+
+				root.appendChild(li);
+			});
+		}
+
+		modalClose.addEventListener('click', () => {
+			document.querySelectorAll('.tl-marker[aria-expanded="true"]').forEach((m) => m.setAttribute('aria-expanded', 'false'));
+			closeModal();
+		});
+		modal.addEventListener('click', (event) => {
+			if (event.target === modal) {
+				document.querySelectorAll('.tl-marker[aria-expanded="true"]').forEach((m) => m.setAttribute('aria-expanded', 'false'));
+				closeModal();
+			}
+		});
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+				document.querySelectorAll('.tl-marker[aria-expanded="true"]').forEach((m) => m.setAttribute('aria-expanded', 'false'));
+				closeModal();
+			}
+		});
+
+		buildTimeline('timeline-historia', window.TIMELINE_AVIACAO, 'historia');
+		buildTimeline('timeline-acidentes', window.TIMELINE_ACIDENTES, 'acidentes');
+	})();
+</script>
+<script src="../js/bob-chatbot.js"></script>
+</body>
+</html>
