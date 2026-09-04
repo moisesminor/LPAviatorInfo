@@ -40,13 +40,25 @@
 	<main class="min-h-screen">
 		<section class="relative isolate flex h-[100svh] min-h-[560px] w-full items-center justify-center overflow-hidden bg-[#0a1830]" id="hero" aria-labelledby="home-title">
 
+			<!-- Fundo "liquid ether" (fluido WebGL) atrás de tudo. Só é montado no
+			     mobile pelo js/hero-aircraft.js, para dar destaque ao avião 3D. -->
+			<div class="absolute inset-0" id="hero-ether" aria-hidden="true" hidden></div>
+
 			<!-- Vídeo de fundo: nunca dá play sozinho — o currentTime é conduzido pelo
 			     progresso do scroll (ver hero.js). Reencodado com keyframe a cada
 			     frame (ver images/AviaoVideoPousando-web.mp4) para o seek do scrub
-			     ficar liso; o .mp4 original ficou como veio, com 1 keyframe só. -->
+			     ficar liso; o .mp4 original ficou como veio, com 1 keyframe só.
+			     Só entra em telas >= 768px; abaixo disso o hero.js nem monta o
+			     scrub e o hero-aircraft.js usa o modelo 3D abaixo. -->
 			<video class="absolute inset-0 h-full w-full object-cover" id="hero-video" src="./images/AviaoVideoPousando-web.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
 
-			<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0a1830]/85 via-[#0a1830]/25 to-[#0a1830]/90" aria-hidden="true"></div>
+			<!-- Avião 3D interativo (só mobile, montado por js/hero-aircraft.js).
+			     O <img> é o fallback caso o Three.js não carregue. -->
+			<div class="absolute inset-0" id="hero-aircraft" aria-hidden="true" hidden>
+				<img src="./images/AviaoSVG.svg" alt="" loading="lazy" hidden>
+			</div>
+
+			<div class="hero-scrim pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0a1830]/85 via-[#0a1830]/25 to-[#0a1830]/90" aria-hidden="true"></div>
 
 			<!-- Conteúdo revelado aos poucos conforme o scroll avança (ver hero.js). -->
 			<div class="relative z-10 mx-auto w-[min(760px,92%)] text-center" id="hero-copy">
@@ -63,12 +75,20 @@
 	</main>
 
 	<script>
-		document.getElementById('year').textContent = new Date().getFullYear();
+		var yearEl = document.getElementById('year');
+		if (yearEl) yearEl.textContent = new Date().getFullYear();
 	</script>
 	<script src="./js/header-nav.js"></script>
 	<script src="./vendor/gsap.min.js"></script>
 	<script src="./vendor/ScrollTrigger.min.js"></script>
 	<script src="./js/hero.js"></script>
+	<!-- Fundo de fluido do hero (mobile). Só define window.createLiquidEther;
+	     quem instancia é o hero-aircraft.js. -->
+	<script src="./js/liquid-ether.js"></script>
+	<!-- Modelo 3D do hero para mobile. O Three.js (vendor/three.min.js) é
+	     carregado sob demanda por este script só quando a tela é pequena, e
+	     serve tanto o avião quanto o fundo liquid ether. -->
+	<script src="./js/hero-aircraft.js"></script>
 	<script src="./js/aircraft-data.js"></script>
 	<script src="./js/bob-chatbot.js"></script>
 </body>

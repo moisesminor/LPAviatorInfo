@@ -33,6 +33,11 @@
 	].filter(function (step) { return !!step.el; });
 
 	var reduceMotionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+	// O hero em vídeo com scrub de scroll só roda em telas maiores. Abaixo de
+	// 768px o js/hero-aircraft.js assume e mostra um avião 3D interativo atrás
+	// do mesmo texto — aqui só garantimos que o vídeo saia de cena e o conteúdo
+	// fique visível sem depender de scroll.
+	var desktopMQ = window.matchMedia('(min-width: 768px)');
 	var teardown = null;
 	var metadataListenerAttached = false;
 
@@ -44,6 +49,22 @@
 		if (teardown) {
 			teardown();
 			teardown = null;
+		}
+
+		if (!desktopMQ.matches) {
+			// Mobile: sem pin, sem scrub. Descarrega o vídeo e revela o texto.
+			try { video.pause(); } catch (e) {}
+			video.preload = 'none';
+			video.classList.add('hidden');
+			showStaticContent();
+			return;
+		}
+
+		video.classList.remove('hidden');
+		if (video.preload !== 'auto') {
+			// pode ter sido descarregado no modo mobile — recarrega os metadados
+			video.preload = 'auto';
+			video.load();
 		}
 
 		if (reduceMotionMQ.matches) {
@@ -137,9 +158,11 @@
 
 	if (reduceMotionMQ.addEventListener) {
 		reduceMotionMQ.addEventListener('change', boot);
+		desktopMQ.addEventListener('change', boot);
 	} else if (reduceMotionMQ.addListener) {
 		// Safari antigo
 		reduceMotionMQ.addListener(boot);
+		desktopMQ.addListener(boot);
 	}
 
 	boot();
