@@ -199,6 +199,7 @@
 			padding: 1rem;
 		}
 		.aircraft-track {
+			align-items: flex-start;
 			scrollbar-width: thin;
 			scrollbar-color: #438ff0 #d7e4f7;
 		}
@@ -399,6 +400,7 @@
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./simulacao.html">Simulação</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./rastreio.html">Rastreio</a>
 				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./comparar.html">Comparar</a>
+				<a class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-5 sm:text-base" href="./linha-do-tempo.html">Linha do tempo</a>
 			</nav>
 			<button type="button" id="nav-toggle" class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:hidden" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menu">
 				<svg id="nav-icon-open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
@@ -412,6 +414,7 @@
 			<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./simulacao.html">Simulação</a>
 			<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./rastreio.html">Rastreio</a>
 			<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./comparar.html">Comparar</a>
+			<a class="block rounded-lg px-4 py-3 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" href="./linha-do-tempo.html">Linha do tempo</a>
 		</nav>
 	</header>
 	<main class="mx-auto w-[min(1100px,calc(100%-40px))] px-0 py-[52px] pb-20">
@@ -604,7 +607,7 @@
 			const grid = document.createElement('div');
 			grid.className = 'aircraft-grid mt-0 mb-8 w-full rounded-b-[12px] bg-[#edf3fb]';
 			const track = document.createElement('div');
-			track.className = 'aircraft-track flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:gap-6';
+			track.className = 'aircraft-track flex items-start w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:gap-6';
 			grid.appendChild(track);
 
 			group.appendChild(heading);
