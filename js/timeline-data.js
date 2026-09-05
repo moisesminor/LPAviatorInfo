@@ -43,7 +43,7 @@ window.TIMELINE_AVIACAO = [
 			'O voo mais longo do dia durou 59 segundos e cobriu 260 metros. O feito foi resultado de anos de experimentos com planadores e de um túnel de vento construído pelos próprios irmãos.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/First_flight2.jpg', credito: 'John T. Daniels / Biblioteca do Congresso dos EUA' },
+			{ src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrt-FXOSN2j-tunPe_Viiq1_xOrevo2KybweiE1IDtUvHHPo-C15bJ-xA&s=10', credito: 'John T. Daniels / Biblioteca do Congresso dos EUA' },
 		],
 	},
 	{
@@ -55,7 +55,7 @@ window.TIMELINE_AVIACAO = [
 			'Por ter decolado apenas com seus próprios meios, sem auxílio de catapultas ou ventos fortes, o voo é considerado por muitos o primeiro reconhecido publicamente na Europa.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Santos-Dumont_flying_the_14_bis.jpg', credito: 'Domínio público' },
+			{ src: 'https://www.meisterdrucke.uk/kunstwerke/1260px/English_School_-_Postcard_depicting_the_Santos-Dumont_14-bis_aeroplane_c_1910_-_%28MeisterDrucke-446163%29.jpg', credito: 'Domínio público' },
 		],
 	},
 	{
@@ -67,7 +67,7 @@ window.TIMELINE_AVIACAO = [
 			'A travessia enfrentou nevoeiro, formação de gelo e falhas de instrumentos, e provou que voos transatlânticos diretos eram possíveis.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Vickers_Vimy_takes_off_from_Lester%27s_Field.jpg', credito: 'Domínio público' },
+			{ src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhfZxg1Ex94GyIBbetIHo85VOOZiboIWtA2pOrvIU-yEFev3B5zV256dVE&s=10', credito: 'Domínio público' },
 		],
 	},
 	{
@@ -79,7 +79,7 @@ window.TIMELINE_AVIACAO = [
 			'A façanha transformou Lindbergh em celebridade mundial e acelerou o investimento comercial na aviação de longa distância.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/6/68/Charles_Lindbergh_and_the_Spirit_of_St._Louis_%28Crisco_restoration%2C_with_wings%29.jpg', credito: 'Domínio público' },
+			{ src: 'https://acervo.oglobo.globo.com/incoming/10381820-99b-5e3/materia/charles.jpg', credito: 'Acervo O Globo' },
 		],
 	},
 	{
@@ -91,7 +91,7 @@ window.TIMELINE_AVIACAO = [
 			'Foi o marco inicial da era dos jatos, que mudaria radicalmente a velocidade e a altitude de operação das aeronaves nas décadas seguintes.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Heinkel_He_178_V1.jpg', credito: 'Domínio público' },
+			{ src: 'https://preview.redd.it/the-heinkel-he-178-a-k-a-the-worlds-first-turbojet-aircraft-v0-b2cymfps83611.jpg?width=640&crop=smart&auto=webp&s=b8a4c4dddbe006c91de904ac365d3610c4d1b322', credito: 'Domínio público' },
 		],
 	},
 	{
@@ -103,7 +103,7 @@ window.TIMELINE_AVIACAO = [
 			'O voo mostrou que era possível controlar uma aeronave em regime supersônico e abriu caminho para os caças e transportes de alta velocidade.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Bell_X-1_color.jpg', credito: 'NASA' },
+			{ src: 'https://www.aereo.jor.br/wp-content/uploads//2015/10/Chuck-Yeager-Breaks-the-Sound-Barrier.jpg', credito: 'NASA' },
 		],
 	},
 	{
@@ -115,7 +115,7 @@ window.TIMELINE_AVIACAO = [
 			'Acidentes causados por fadiga estrutural em torno das janelas levaram à retirada temporária do modelo e a mudanças profundas nas normas de projeto de fuselagens pressurizadas.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/BOAC_Comet_G-APAS.jpg', credito: 'RuthAS / CC BY 3.0' },
+			{ src: 'https://blog.bianch.com.br/wp-content/uploads/2023/04/Aeromaritime_de_Havilland_Comet_1_Groves-1.jpg', credito: 'RuthAS / CC BY 3.0' },
 		],
 	},
 	{
@@ -127,8 +127,8 @@ window.TIMELINE_AVIACAO = [
 			'Poucas semanas depois, em 2 de março de 1969, o Concorde franco-britânico fez seu voo inaugural, tornando-se o único transporte supersônico a operar comercialmente por décadas.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Boeing_747-121%2C_Pan_American_World_Airways_-_Pan_Am_AN1023837.jpg', credito: 'Domínio público' },
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/1/16/British_Airways_Concorde_G-BOAC_03.jpg', credito: 'Eduard Marmet / CC BY-SA 3.0' },
+			{ src: 'https://i.redd.it/hrkaah1avvod1.jpeg', credito: 'Domínio público' },
+			{ src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTABcD7h4hwnPL5OcGu1wnDIFE6tSqgtWy75kCqHPrY2DPkEbCVFWV-CGET&s=10', credito: 'Eduard Marmet / CC BY-SA 3.0' },
 		],
 	},
 	{
@@ -140,7 +140,7 @@ window.TIMELINE_AVIACAO = [
 			'O conceito se tornou padrão da indústria e influenciou praticamente todos os projetos de aeronaves de transporte que vieram depois.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Air_France_Airbus_A320-214_F-HEPF.jpg', credito: 'Alan Wilson / CC BY-SA 2.0' },
+			{ src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRkm_Nd7MaJ-l_K4CrJnI4H6qQba-qx8n4c0yJLPHBGCHhnzRyl4ZOWF8&s=10', credito: 'Alan Wilson / CC BY-SA 2.0' },
 		],
 	},
 
@@ -158,7 +158,7 @@ window.TIMELINE_ACIDENTES = [
 			'Com 583 vítimas, é o acidente com maior número de mortos na história da aviação. Levou a mudanças no fraseado padrão de comunicações e ao reforço do conceito de gestão de recursos de cabine (CRM).',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/KLM_Boeing_747-206B_PH-BUF.jpg', credito: 'Domínio público' },
+			{ src: 'https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/AAFC/production/_95327734_klm.jpg.webp', credito: 'Domínio público' },
 		],
 	},
 	{
@@ -170,7 +170,7 @@ window.TIMELINE_ACIDENTES = [
 			'A tripulação lutou por 32 minutos com controle apenas por potência dos motores antes da queda contra uma montanha. É o acidente com aeronave única mais letal da história.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Japan_Airlines_Boeing_747SR-46_JA8119_Itazuke.jpg', credito: 'Domínio público' },
+			{ src: 'https://s.yimg.com/lo/mysterio/api/4b15a9622b5c17d6edfc7f506251de1965b096e5aef9e61fc7d01c2c3237a8eb/lightyear_networkapi/resizefill_w960%3Bquality_80%3Bformat_webp/https%3A%2F%2Fmedia.zenfs.com%2Fen%2Fthe_telegraph_258%2Ff9dc60bc3df3918ed6227605f6cff3dc', credito: 'Domínio público' },
 		],
 	},
 	{
@@ -182,7 +182,7 @@ window.TIMELINE_ACIDENTES = [
 			'A investigação concluiu que vapores inflamáveis no tanque central de combustível foram acesos por uma falha elétrica, o que resultou em novas exigências de inertização de tanques.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Trans_World_Airlines_Boeing_747-131_N93119.jpg', credito: 'Domínio público' },
+			{ src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7KyE0ZQ4kTCaz9gowyYYmb9GvuPWsbBFzD2cYNGSiXc-1tMqVXpgKdq8&s=10', credito: 'Domínio público' },
 		],
 	},
 	{
@@ -194,7 +194,7 @@ window.TIMELINE_ACIDENTES = [
 			'O congelamento dos tubos de Pitot gerou indicações de velocidade inconsistentes; a resposta inadequada da tripulação levou a aeronave a uma perda de sustentação prolongada. O caso reforçou o treinamento de recuperação de estol em grandes altitudes.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/F-GZCP_Air_France_Airbus_A330-203_%28cn_660%29_%285143229202%29.jpg', credito: 'Pawel Kierzkowski / CC BY-SA 3.0' },
+			{ src: 'https://cdn.britannica.com/16/282316-050-12D7AFA8/Wreckage-Of-Air-Bus-A330-200-Jetliner-Which-Crashed-In-The-Atlantic-Ocean-With-228-People-On-Board-From-Rio-de-Janeiro-To-Paris.jpg', credito: 'Pawel Kierzkowski / CC BY-SA 3.0' },
 		],
 	},
 	{
@@ -206,7 +206,7 @@ window.TIMELINE_ACIDENTES = [
 			'Ambos foram associados ao sistema MCAS, que agia com base em um único sensor de ângulo de ataque. A frota do 737 MAX ficou em solo no mundo todo por cerca de 20 meses.',
 		],
 		imagens: [
-			{ src: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Lion_Air_Boeing_737_MAX_8_PK-LQP.jpg', credito: 'PK-REN / CC BY-SA 4.0' },
+			{ src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_AcLnzQkYWKCx5Yo3obox7UBVcbgrDmlL4cXMOThiZ_RD9k6tvZBci9U&s=10', credito: 'PK-REN / CC BY-SA 4.0' },
 		],
 	},
 
